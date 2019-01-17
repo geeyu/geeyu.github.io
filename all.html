@@ -82,6 +82,45 @@ $(document).ready(function(event) {
 
 	<article>
 		 <header>
+		  	<h1 class="entry-title"><a href="15476981952811.html">标题</a></h1>
+			<p class="meta"><time datetime="2019-01-17T12:09:55+08:00" 
+			pubdate data-updated="true">2019/1/17</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h3 id="toc_0">正文</h3>
+
+<blockquote>
+<p>go 网络服务</p>
+</blockquote>
+
+<pre><code class="language-go">package main
+
+import (
+    &quot;net/http&quot;
+    &quot;fmt&quot;
+)
+
+func test(w http.ResponseWrite,r *http.Request) {
+    fmt.Fprintf(w, &quot;hello world %s&quot;, r.URL.Path[1:])
+}
+
+func main() {
+    http.HandleFunc(&quot;/&quot;, test)
+    http.ListenAndServe(&quot;:8080&quot;, nil)
+}
+
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
 		  	<h1 class="entry-title"><a href="15476504728117.html">Markdown 语法和 MWeb 写作使用说明</a></h1>
 			<p class="meta"><time datetime="2019-01-16T22:54:32+08:00" 
 			pubdate data-updated="true">2019/1/16</time></p>
@@ -158,12 +197,25 @@ Markdown 的語法有個主要的目的：用來作為一種網路內容的<em>�
 	        
 	        
 	      </li>
+	  
+	      <li class="post">
+	        <a href="go.html"><strong>go&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
 	   
 	  </ul>
 	</section>
 	<section>
 	  <h1>Recent Posts</h1>
 	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15476981952811.html">标题</a>
+		      </li>
+	     
 	  
 	      
 		      <li class="post">
