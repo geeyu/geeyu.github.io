@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <title>
     
-  postgres - 搁羽念风
+  redis 集群部署 - 搁羽念风
   
 
   </title>
@@ -78,42 +78,129 @@ $(document).ready(function(event) {
 </nav>
   <div id="main">
     <div id="content"> 
-<div class="blog-index">
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">redis 集群部署</h1>
+				<p class="meta"><time datetime="2019-01-22T14:06:50+08:00" pubdate data-updated="true">2019/1/22</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<h2 id="toc_0">现有的集群方式</h2>
 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15476504728117.html">Markdown 语法和 MWeb 写作使用说明</a></h1>
-			<p class="meta"><time datetime="2019-01-16T22:54:32+08:00" 
-			pubdate data-updated="true">2019/1/16</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<h2 id="toc_0">Markdown 的设计哲学</h2>
+<ol>
+<li>官方集群 cluster 方式 5.0 自带</li>
+<li>twemproxy 代理方式</li>
+<li>哨兵模式</li>
+<li>codis</li>
+<li>客户端分片模式</li>
+</ol>
+
+<h2 id="toc_1">cluster 集群方式</h2>
+
+<h3 id="toc_2">安装</h3>
+
+<ol>
+<li><p>下载代码<br/>
+<code><br/>
+mkdir -p /apps/redis-cluster &amp; cd /apps/redis-cluster<br/>
+wget http://download.redis.io/releases/redis-5.0.3.tar.gz<br/>
+tar zxvf redis-5.0.3.tar.gz<br/>
+cd redis-5.0.3<br/>
+make<br/>
+cp ./src/redis-server ../<br/>
+cp ./src/redis-cli ../<br/>
+</code></p></li>
+<li><p>创建一组配置文件</p></li>
+</ol>
+
+<pre><code>mkdir 9001 9002 9003 9004 9005 9006
+</code></pre>
 
 <blockquote>
-<p>Markdown 的目標是實現「易讀易寫」。<br/>
-不過最需要強調的便是它的可讀性。一份使用 Markdown 格式撰寫的文件應該可以直接以純文字發佈，並且看起來不會像是由許多標籤或是格式指令所構成。<br/>
-Markdown 的語法有個主要的目的：用來作為一種網路內容的<em>寫作</em>用語言。</p>
+<p>每个目录下写入配置</p>
 </blockquote>
 
+<pre><code># 设定端口
+port 9001
+# 开启集群
+cluster-enabled yes
+# 保存节点配置文件
+cluster-config-file &quot;nodes.conf&quot;
+# 集群节点的超时时限,默认值为 15000
+cluster-node-timeout 5000
+# 日志文件
+logfile &quot;log.log&quot; 
+# 开启数据持久化
+appendonly yes
+# 数据文件
+dbfilename &quot;dump.rdb&quot;
+# 守护进程
+daemonize yes
+# 节点间同步密码
+masterauth 123456
+# 设置密码
+requirepass 123456
+</code></pre>
 
+<blockquote>
+<p>每个目录下都执行一遍<br/>
+<code><br/>
+cd ./9001<br/>
+../redis-server ./redis.conf<br/>
+</code></p>
+</blockquote>
+
+<h3 id="toc_3">创建集群</h3>
+
+<blockquote>
+<p><code>--replicas 1</code> 表示,每个主节点创建一个从节点<br/>
+下面操作,将会将配置应用到各个节点,并(join)起来,让节点们互相通讯起来<br/>
+<code><br/>
+./redis-cli --cluster create 127.0.0.1:9001 127.0.0.1:9002 127.0.0.1:9003 127.0.0.1:9004 127.0.0.1:9005 127.0.0.1:9006 --cluster-replicas 1<br/>
+</code></p>
+</blockquote>
+
+<h3 id="toc_4">连接方式</h3>
+
+<blockquote>
+<p><code>redis-cli -c -p 9001 -a 123456</code> </p>
+</blockquote>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='redis.html'>redis</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
 
 		</div>
 
-		 
-		 <footer>
-      	<a rel="full-article" href="15476504728117.html#more">read more &rarr;</a>
-    	</footer>
-    	
-
-	</article>
-  
-	<div class="pagination">
-	
-<a href="archives.html">Blog Archives</a>
-	 
+	    <p class="meta">
 	    
-	</div>
+	    
+	        <a class="basic-alignment right" href="15476981952811.html" 
+	        title="Next Post: goWeb 编程">goWeb 编程 &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
 </div>
  <aside class="sidebar"> 
 
