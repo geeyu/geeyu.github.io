@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <title>
     
-  postgres - 搁羽念风
+  go 语言类型推断 - 搁羽念风
   
 
   </title>
@@ -78,42 +78,156 @@ $(document).ready(function(event) {
 </nav>
   <div id="main">
     <div id="content"> 
-<div class="blog-index">
-
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15476504728117.html">Markdown 语法和 MWeb 写作使用说明</a></h1>
-			<p class="meta"><time datetime="2019-01-16T22:54:32+08:00" 
-			pubdate data-updated="true">2019/1/16</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<h2 id="toc_0">Markdown 的设计哲学</h2>
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">go 语言类型推断</h1>
+				<p class="meta"><time datetime="2019-01-25T00:20:13+08:00" pubdate data-updated="true">2019/1/25</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<h2 id="toc_0">执行之前动态确保一个结构体拥有某个方法</h2>
 
 <blockquote>
-<p>Markdown 的目標是實現「易讀易寫」。<br/>
-不過最需要強調的便是它的可讀性。一份使用 Markdown 格式撰寫的文件應該可以直接以純文字發佈，並且看起來不會像是由許多標籤或是格式指令所構成。<br/>
-Markdown 的語法有個主要的目的：用來作為一種網路內容的<em>寫作</em>用語言。</p>
+<p>类型断言之后,只能使用接口里定义的方法<br/>
+比如 Runner 实际上有 <code>SetId</code> 和 <code>GetId</code> 两个方法<br/>
+但是 动态约束了 <code>demo.(interface{SetId(int64)})</code> 之后<br/>
+就只能使用<code>SetId</code> 这个方法了</p>
 </blockquote>
 
+<pre><code class="language-go">package main
 
+import (
+    &quot;fmt&quot;
+)
+
+type Runner struct {
+    Num int64
+}
+
+func (self *Runner) SetId(num int64) {
+    self.Num = num
+    fmt.Println(self.Num)
+}
+
+func (self *Runner) GetId() int64 {
+    return self.Num
+}
+
+func main() {
+    var demo interface{} = new(Runner)
+    
+    demo.(interface {
+        SetId(int64)
+    }).SetId(134)
+}
+
+</code></pre>
+
+<h2 id="toc_1">利用类型断言,确定变量的类型</h2>
+
+<blockquote>
+<p>可以根据不同的类型,进行不同的操作</p>
+</blockquote>
+
+<pre><code class="language-go">package main
+
+import (
+    &quot;fmt&quot;
+)
+
+func checkType(in interface{}) {
+
+    switch value := in.(type) {
+    case int:
+        fmt.Println(&quot;int&quot;, value)
+    case string:
+        fmt.Println(&quot;string&quot;, value)
+    default:
+        fmt.Println(&quot;unknow&quot;, value)
+    }
+}
+
+func main() {
+    ccc := 134
+    checkType(ccc)
+    ddd := &quot;133&quot;
+    checkType(ddd)
+    eee := []string{&quot;d&quot;, &quot;d&quot;, &quot;e&quot;}
+    checkType(eee)
+}
+
+</code></pre>
+
+<h2 id="toc_2">函数作为参数传递</h2>
+
+<blockquote>
+<p>函数作为参数传入 并且 被调函数, 参数类型为 interface{}时<br/>
+该函数是无法执行的<br/>
+将其进行类型转换,即可执行</p>
+</blockquote>
+
+<pre><code class="language-go">package main
+
+import &quot;fmt&quot;
+
+type Handler func(int, string, int) // 定义一个函数类型
+
+func demo(a int, b string, c int) {
+    fmt.Println(a, b, c)
+}
+
+func check(in interface{}) {
+    in.(Handler)(112, &quot;ccc&quot;, 222)
+}
+
+func main() {
+    check(Handler(demo))
+}
+</code></pre>
+
+<h2 id="toc_3">类型断言</h2>
+
+<pre><code class="language-go">x := &quot;hello world&quot;
+if v, ok := interface{}(x).(string); ok { // interface{}(x):把 x 的类型转换成 interface{}
+    fmt.Println(v)
+}
+</code></pre>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='go.html'>go</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
 
 		</div>
 
-		 
-		 <footer>
-      	<a rel="full-article" href="15476504728117.html#more">read more &rarr;</a>
-    	</footer>
-    	
-
-	</article>
-  
-	<div class="pagination">
-	
-<a href="archives.html">Blog Archives</a>
-	 
+	    <p class="meta">
 	    
-	</div>
+	    
+	        <a class="basic-alignment right" href="15482336668160.html" 
+	        title="Next Post: 应用 2：缓兵之计 —— 延时队列">应用 2：缓兵之计 —— 延时队列 &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
 </div>
  <aside class="sidebar"> 
 
