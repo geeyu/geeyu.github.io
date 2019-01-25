@@ -100,27 +100,26 @@ $(document).ready(function(event) {
 <h3 id="toc_2">安装</h3>
 
 <ol>
-<li><p>下载代码<br/>
-<code><br/>
-mkdir -p /apps/redis-cluster &amp; cd /apps/redis-cluster<br/>
+<li><p>下载代码</p>
+<pre class="line-numbers"><code class="language-text">mkdir -p /apps/redis-cluster &amp; cd /apps/redis-cluster
 wget http://download.redis.io/releases/redis-5.0.3.tar.gz<br/>
 tar zxvf redis-5.0.3.tar.gz<br/>
 cd redis-5.0.3<br/>
 make<br/>
 cp ./src/redis-server ../<br/>
-cp ./src/redis-cli ../<br/>
-</code></p></li>
+cp ./src/redis-cli ../
+</code></pre></li>
 <li><p>创建一组配置文件</p></li>
 </ol>
 
-<pre><code>mkdir 9001 9002 9003 9004 9005 9006
+<pre class="line-numbers"><code class="language-text">mkdir 9001 9002 9003 9004 9005 9006
 </code></pre>
 
 <blockquote>
 <p>每个目录下写入配置</p>
 </blockquote>
 
-<pre><code># 设定端口
+<pre class="line-numbers"><code class="language-text"># 设定端口
 port 9001
 # 开启集群
 cluster-enabled yes
@@ -143,21 +142,21 @@ requirepass 123456
 </code></pre>
 
 <blockquote>
-<p>每个目录下都执行一遍<br/>
-<code><br/>
-cd ./9001<br/>
-../redis-server ./redis.conf<br/>
-</code></p>
+<p>每个目录下都执行一遍</p>
+
+<pre class="line-numbers"><code class="language-text">cd ./9001
+../redis-server ./redis.conf
+</code></pre>
 </blockquote>
 
 <h3 id="toc_3">创建集群</h3>
 
 <blockquote>
 <p><code>--replicas 1</code> 表示,每个主节点创建一个从节点<br/>
-下面操作,将会将配置应用到各个节点,并(join)起来,让节点们互相通讯起来<br/>
-<code><br/>
-./redis-cli --cluster create 127.0.0.1:9001 127.0.0.1:9002 127.0.0.1:9003 127.0.0.1:9004 127.0.0.1:9005 127.0.0.1:9006 --cluster-replicas 1<br/>
-</code></p>
+下面操作,将会将配置应用到各个节点,并(join)起来,让节点们互相通讯起来</p>
+
+<pre class="line-numbers"><code class="language-text">./redis-cli --cluster create 127.0.0.1:9001 127.0.0.1:9002 127.0.0.1:9003 127.0.0.1:9004 127.0.0.1:9005 127.0.0.1:9006 --cluster-replicas 1
+</code></pre>
 </blockquote>
 
 <h3 id="toc_4">连接方式</h3>
@@ -212,13 +211,6 @@ cd ./9001<br/>
 	  <ul id="recent_posts">
 	  
 	      <li class="post">
-	        <a href="postgres.html"><strong>postgres&nbsp;(1)</strong></a>
-	        
-	        
-	        
-	      </li>
-	  
-	      <li class="post">
 	        <a href="go.html"><strong>go&nbsp;(2)</strong></a>
 	        
 	        
@@ -267,10 +259,6 @@ cd ./9001<br/>
 		        <a href="15476981952811.html">goWeb 编程</a>
 		      </li>
 	     
-	  
-	      
-	  
-	      
 	   
 	  </ul>
 	</section>
@@ -286,7 +274,7 @@ cd ./9001<br/>
   
     
 
-<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
 
 </body>

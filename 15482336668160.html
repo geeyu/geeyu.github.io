@@ -97,7 +97,7 @@ $(document).ready(function(event) {
 
 <p><img src="https://user-gold-cdn.xitu.io/2018/7/10/1648229e1dbfd776?w=862&amp;h=179&amp;f=png&amp;s=17012" alt=""/></p>
 
-<pre><code>&gt; rpush notify-queue apple banana pear
+<pre class="line-numbers"><code class="language-text">&gt; rpush notify-queue apple banana pear
 (integer) 3
 &gt; llen notify-queue
 (integer) 3
@@ -127,7 +127,7 @@ $(document).ready(function(event) {
 
 <p>通常我们使用 sleep 来解决这个问题，让线程睡一会，睡个 1s 钟就可以了。不但客户端的 CPU 能降下来，Redis 的 QPS 也降下来了。</p>
 
-<pre><code>time.sleep(1) # python 睡 1s
+<pre class="line-numbers"><code class="language-text">time.sleep(1) # python 睡 1s
 Thread.sleep(1000) # java 睡 1s
 </code></pre>
 
@@ -155,10 +155,13 @@ Thread.sleep(1000) # java 睡 1s
 
 <h2 id="toc_4">锁冲突处理</h2>
 
-<p>上节课我们讲了分布式锁的问题，但是没有提到客户端在处理请求时加锁没加成功怎么办。一般有 3 种策略来处理加锁失败：<br/>
-1. 直接抛出异常，通知用户稍后重试；<br/>
-2. sleep 一会再重试；<br/>
-3. 将请求转移至延时队列，过一会再试；</p>
+<p>上节课我们讲了分布式锁的问题，但是没有提到客户端在处理请求时加锁没加成功怎么办。一般有 3 种策略来处理加锁失败：</p>
+
+<ol>
+<li>直接抛出异常，通知用户稍后重试；</li>
+<li>sleep 一会再重试；</li>
+<li>将请求转移至延时队列，过一会再试；</li>
+</ol>
 
 <p><strong>直接抛出特定类型的异常</strong></p>
 
@@ -176,7 +179,7 @@ Thread.sleep(1000) # java 睡 1s
 
 <p>延时队列可以通过 Redis 的 zset(有序列表) 来实现。我们将消息序列化成一个字符串作为 zset 的<code>value</code>，这个消息的到期处理时间作为<code>score</code>，然后用多个线程轮询 zset 获取到期的任务进行处理，多个线程是为了保障可用性，万一挂了一个线程还有其它线程可以继续处理。因为有多个线程，所以需要考虑并发争抢任务，确保任务不能被多次执行。</p>
 
-<pre><code class="language-py">def delay(msg):
+<pre class="line-numbers"><code class="language-python">def delay(msg):
  msg.id = str(uuid.uuid4()) # 保证 value 值唯一
  value = json.dumps(msg)
  retry_ts = time.time() + 5 # 5 秒后重试
@@ -201,7 +204,7 @@ def loop():
 
 <p>同时，我们要注意一定要对 handle_msg 进行异常捕获，避免因为个别任务处理问题导致循环异常退出。以下是 Java 版本的延时队列实现，因为要使用到 Json 序列化，所以还需要 fastjson 库的支持。</p>
 
-<pre><code class="language-java">import java.lang.reflect.Type;
+<pre class="line-numbers"><code class="language-java">import java.lang.reflect.Type;
 import java.util.Set;
 import java.util.UUID;
 
@@ -352,13 +355,6 @@ public class RedisDelayingQueue&lt;T&gt; {
 	  <ul id="recent_posts">
 	  
 	      <li class="post">
-	        <a href="postgres.html"><strong>postgres&nbsp;(1)</strong></a>
-	        
-	        
-	        
-	      </li>
-	  
-	      <li class="post">
 	        <a href="go.html"><strong>go&nbsp;(2)</strong></a>
 	        
 	        
@@ -407,10 +403,6 @@ public class RedisDelayingQueue&lt;T&gt; {
 		        <a href="15476981952811.html">goWeb 编程</a>
 		      </li>
 	     
-	  
-	      
-	  
-	      
 	   
 	  </ul>
 	</section>
@@ -426,7 +418,7 @@ public class RedisDelayingQueue&lt;T&gt; {
   
     
 
-<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
 
 </body>

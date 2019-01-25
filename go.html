@@ -97,7 +97,7 @@ $(document).ready(function(event) {
 就只能使用<code>SetId</code> 这个方法了</p>
 </blockquote>
 
-<pre><code class="language-go">package main
+<pre class="line-numbers"><code class="language-go">package main
 
 import (
     &quot;fmt&quot;
@@ -132,7 +132,7 @@ func main() {
 <p>可以根据不同的类型,进行不同的操作</p>
 </blockquote>
 
-<pre><code class="language-go">package main
+<pre class="line-numbers"><code class="language-go">package main
 
 import (
     &quot;fmt&quot;
@@ -169,7 +169,7 @@ func main() {
 将其进行类型转换,即可执行</p>
 </blockquote>
 
-<pre><code class="language-go">package main
+<pre class="line-numbers"><code class="language-go">package main
 
 import &quot;fmt&quot;
 
@@ -190,7 +190,7 @@ func main() {
 
 <h2 id="toc_3">类型断言</h2>
 
-<pre><code class="language-go">x := &quot;hello world&quot;
+<pre class="line-numbers"><code class="language-go">x := &quot;hello world&quot;
 if v, ok := interface{}(x).(string); ok { // interface{}(x):把 x 的类型转换成 interface{}
     fmt.Println(v)
 }
@@ -217,7 +217,7 @@ if v, ok := interface{}(x).(string); ok { // interface{}(x):把 x 的类型转�
 <p>go 网络服务</p>
 </blockquote>
 
-<pre><code class="language-go">package main
+<pre class="line-numbers"><code class="language-go">package main
 
 import (
     &quot;net/http&quot;
@@ -254,13 +254,6 @@ func main() {
 	<section>
 	  <h1>Categories</h1>
 	  <ul id="recent_posts">
-	  
-	      <li class="post">
-	        <a href="postgres.html"><strong>postgres&nbsp;(1)</strong></a>
-	        
-	        
-	        
-	      </li>
 	  
 	      <li class="post">
 	        <a href="go.html"><strong>go&nbsp;(2)</strong></a>
@@ -311,10 +304,6 @@ func main() {
 		        <a href="15476981952811.html">goWeb 编程</a>
 		      </li>
 	     
-	  
-	      
-	  
-	      
 	   
 	  </ul>
 	</section>
@@ -330,7 +319,7 @@ func main() {
   
     
 
-<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
 
 </body>

@@ -97,7 +97,7 @@ $(document).ready(function(event) {
 就只能使用<code>SetId</code> 这个方法了</p>
 </blockquote>
 
-<pre><code class="language-go">package main
+<pre class="line-numbers"><code class="language-go">package main
 
 import (
     &quot;fmt&quot;
@@ -132,7 +132,7 @@ func main() {
 <p>可以根据不同的类型,进行不同的操作</p>
 </blockquote>
 
-<pre><code class="language-go">package main
+<pre class="line-numbers"><code class="language-go">package main
 
 import (
     &quot;fmt&quot;
@@ -169,7 +169,7 @@ func main() {
 将其进行类型转换,即可执行</p>
 </blockquote>
 
-<pre><code class="language-go">package main
+<pre class="line-numbers"><code class="language-go">package main
 
 import &quot;fmt&quot;
 
@@ -190,7 +190,7 @@ func main() {
 
 <h2 id="toc_3">类型断言</h2>
 
-<pre><code class="language-go">x := &quot;hello world&quot;
+<pre class="line-numbers"><code class="language-go">x := &quot;hello world&quot;
 if v, ok := interface{}(x).(string); ok { // interface{}(x):把 x 的类型转换成 interface{}
     fmt.Println(v)
 }
@@ -223,7 +223,7 @@ if v, ok := interface{}(x).(string); ok { // interface{}(x):把 x 的类型转�
 
 <p><img src="https://user-gold-cdn.xitu.io/2018/7/10/1648229e1dbfd776?w=862&amp;h=179&amp;f=png&amp;s=17012" alt=""/></p>
 
-<pre><code>&gt; rpush notify-queue apple banana pear
+<pre class="line-numbers"><code class="language-text">&gt; rpush notify-queue apple banana pear
 (integer) 3
 &gt; llen notify-queue
 (integer) 3
@@ -253,7 +253,7 @@ if v, ok := interface{}(x).(string); ok { // interface{}(x):把 x 的类型转�
 
 <p>通常我们使用 sleep 来解决这个问题，让线程睡一会，睡个 1s 钟就可以了。不但客户端的 CPU 能降下来，Redis 的 QPS 也降下来了。</p>
 
-<pre><code>time.sleep(1) # python 睡 1s
+<pre class="line-numbers"><code class="language-text">time.sleep(1) # python 睡 1s
 Thread.sleep(1000) # java 睡 1s
 </code></pre>
 
@@ -281,10 +281,13 @@ Thread.sleep(1000) # java 睡 1s
 
 <h2 id="toc_4">锁冲突处理</h2>
 
-<p>上节课我们讲了分布式锁的问题，但是没有提到客户端在处理请求时加锁没加成功怎么办。一般有 3 种策略来处理加锁失败：<br/>
-1. 直接抛出异常，通知用户稍后重试；<br/>
-2. sleep 一会再重试；<br/>
-3. 将请求转移至延时队列，过一会再试；</p>
+<p>上节课我们讲了分布式锁的问题，但是没有提到客户端在处理请求时加锁没加成功怎么办。一般有 3 种策略来处理加锁失败：</p>
+
+<ol>
+<li>直接抛出异常，通知用户稍后重试；</li>
+<li>sleep 一会再重试；</li>
+<li>将请求转移至延时队列，过一会再试；</li>
+</ol>
 
 <p><strong>直接抛出特定类型的异常</strong></p>
 
@@ -302,7 +305,7 @@ Thread.sleep(1000) # java 睡 1s
 
 <p>延时队列可以通过 Redis 的 zset(有序列表) 来实现。我们将消息序列化成一个字符串作为 zset 的<code>value</code>，这个消息的到期处理时间作为<code>score</code>，然后用多个线程轮询 zset 获取到期的任务进行处理，多个线程是为了保障可用性，万一挂了一个线程还有其它线程可以继续处理。因为有多个线程，所以需要考虑并发争抢任务，确保任务不能被多次执行。</p>
 
-<pre><code class="language-py">def delay(msg):
+<pre class="line-numbers"><code class="language-python">def delay(msg):
  msg.id = str(uuid.uuid4()) # 保证 value 值唯一
  value = json.dumps(msg)
  retry_ts = time.time() + 5 # 5 秒后重试
@@ -327,7 +330,7 @@ def loop():
 
 <p>同时，我们要注意一定要对 handle_msg 进行异常捕获，避免因为个别任务处理问题导致循环异常退出。以下是 Java 版本的延时队列实现，因为要使用到 Json 序列化，所以还需要 fastjson 库的支持。</p>
 
-<pre><code class="language-java">import java.lang.reflect.Type;
+<pre class="line-numbers"><code class="language-java">import java.lang.reflect.Type;
 import java.util.Set;
 import java.util.UUID;
 
@@ -447,7 +450,7 @@ public class RedisDelayingQueue&lt;T&gt; {
 		 </header>
 	  	<div class="entry-content">
 		  	
-		  	<pre><code># redis进程是否以守护进程的方式运行，yes为是，no为否(不以守护进程的方式运行会占用一个终端)。
+		  	<pre class="line-numbers"><code class="language-text"># redis进程是否以守护进程的方式运行，yes为是，no为否(不以守护进程的方式运行会占用一个终端)。
 daemonize no
 # 指定redis进程的PID文件存放位置
 pidfile /var/run/redis.pid
@@ -519,27 +522,26 @@ appendfsync everysec
 <h3 id="toc_2">安装</h3>
 
 <ol>
-<li><p>下载代码<br/>
-<code><br/>
-mkdir -p /apps/redis-cluster &amp; cd /apps/redis-cluster<br/>
+<li><p>下载代码</p>
+<pre class="line-numbers"><code class="language-text">mkdir -p /apps/redis-cluster &amp; cd /apps/redis-cluster
 wget http://download.redis.io/releases/redis-5.0.3.tar.gz<br/>
 tar zxvf redis-5.0.3.tar.gz<br/>
 cd redis-5.0.3<br/>
 make<br/>
 cp ./src/redis-server ../<br/>
-cp ./src/redis-cli ../<br/>
-</code></p></li>
+cp ./src/redis-cli ../
+</code></pre></li>
 <li><p>创建一组配置文件</p></li>
 </ol>
 
-<pre><code>mkdir 9001 9002 9003 9004 9005 9006
+<pre class="line-numbers"><code class="language-text">mkdir 9001 9002 9003 9004 9005 9006
 </code></pre>
 
 <blockquote>
 <p>每个目录下写入配置</p>
 </blockquote>
 
-<pre><code># 设定端口
+<pre class="line-numbers"><code class="language-text"># 设定端口
 port 9001
 # 开启集群
 cluster-enabled yes
@@ -562,21 +564,21 @@ requirepass 123456
 </code></pre>
 
 <blockquote>
-<p>每个目录下都执行一遍<br/>
-<code><br/>
-cd ./9001<br/>
-../redis-server ./redis.conf<br/>
-</code></p>
+<p>每个目录下都执行一遍</p>
+
+<pre class="line-numbers"><code class="language-text">cd ./9001
+../redis-server ./redis.conf
+</code></pre>
 </blockquote>
 
 <h3 id="toc_3">创建集群</h3>
 
 <blockquote>
 <p><code>--replicas 1</code> 表示,每个主节点创建一个从节点<br/>
-下面操作,将会将配置应用到各个节点,并(join)起来,让节点们互相通讯起来<br/>
-<code><br/>
-./redis-cli --cluster create 127.0.0.1:9001 127.0.0.1:9002 127.0.0.1:9003 127.0.0.1:9004 127.0.0.1:9005 127.0.0.1:9006 --cluster-replicas 1<br/>
-</code></p>
+下面操作,将会将配置应用到各个节点,并(join)起来,让节点们互相通讯起来</p>
+
+<pre class="line-numbers"><code class="language-text">./redis-cli --cluster create 127.0.0.1:9001 127.0.0.1:9002 127.0.0.1:9003 127.0.0.1:9004 127.0.0.1:9005 127.0.0.1:9006 --cluster-replicas 1
+</code></pre>
 </blockquote>
 
 <h3 id="toc_4">连接方式</h3>
@@ -606,7 +608,7 @@ cd ./9001<br/>
 <p>go 网络服务</p>
 </blockquote>
 
-<pre><code class="language-go">package main
+<pre class="line-numbers"><code class="language-go">package main
 
 import (
     &quot;net/http&quot;
@@ -630,65 +632,6 @@ func main() {
 		
 
 	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15476504728117.html">Markdown 语法和 MWeb 写作使用说明</a></h1>
-			<p class="meta"><time datetime="2019-01-16T22:54:32+08:00" 
-			pubdate data-updated="true">2019/1/16</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<h2 id="toc_0">Markdown 的设计哲学</h2>
-
-<blockquote>
-<p>Markdown 的目標是實現「易讀易寫」。<br/>
-不過最需要強調的便是它的可讀性。一份使用 Markdown 格式撰寫的文件應該可以直接以純文字發佈，並且看起來不會像是由許多標籤或是格式指令所構成。<br/>
-Markdown 的語法有個主要的目的：用來作為一種網路內容的<em>寫作</em>用語言。</p>
-</blockquote>
-
-
-
-		</div>
-
-		 
-		 <footer>
-      	<a rel="full-article" href="15476504728117.html#more">read more &rarr;</a>
-    	</footer>
-    	
-
-	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15476504728118.html">欢迎使用 MWeb</a></h1>
-			<p class="meta"><time datetime="2019-01-16T22:54:32+08:00" 
-			pubdate data-updated="true">2019/1/16</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<p>首先介绍一下 MWeb 是什么，MWeb 是专业的 Markdown 写作、记笔记、静态博客生成软件。MWeb 使用的是 Github Flavored Markdown 语法，在使用 MWeb 前，建议你一定要去 <a href="http://zh.mweb.im/">MWeb 官网首页</a> 看一下介绍视频，MWeb 官网也做了比较详细的帮助，建议你也看一下大概内容，帮助的网址为：<a href="http://zh.mweb.im/help.html">http://zh.mweb.im/help.html</a>。</p>
-
-<h2 id="toc_0">需要您重点注意的</h2>
-
-<p>MWeb 是有<strong>两种模式</strong>的：外部模式和文档库模式。MWeb 为了满足所有 Markdown 使用需求，设计了两种模式！外部模式用于打开和编辑所有本地 Markdown 文档。另外为了方便用 Markdown 记笔记，MWeb 设计了文档库模式，文档库中的文档也支持一键生成静态博客，以便于分享。关于两个模式的情况，还是建议您去看一下官网的视频和帮助。</p>
-
-<h2 id="toc_1">帮助我们改进 MWeb</h2>
-
-<p>如果你喜欢 MWeb，想让它变得更好，你可以：</p>
-
-<ol>
-<li>推荐 MWeb，让更多的人知道。</li>
-<li>给我们发反馈和建议：<a href="mailto:coderforart+233@gmail.com">coderforart+233@gmail.com</a></li>
-<li>在 Mac App Store 上评价 （如果是在 MAS 上购买的话）。</li>
-</ol>
-
-
-		</div>
-
-		
-
-	</article>
   
 	<div class="pagination">
 	
@@ -702,13 +645,6 @@ Markdown 的語法有個主要的目的：用來作為一種網路內容的<em>�
 	<section>
 	  <h1>Categories</h1>
 	  <ul id="recent_posts">
-	  
-	      <li class="post">
-	        <a href="postgres.html"><strong>postgres&nbsp;(1)</strong></a>
-	        
-	        
-	        
-	      </li>
 	  
 	      <li class="post">
 	        <a href="go.html"><strong>go&nbsp;(2)</strong></a>
@@ -759,10 +695,6 @@ Markdown 的語法有個主要的目的：用來作為一種網路內容的<em>�
 		        <a href="15476981952811.html">goWeb 编程</a>
 		      </li>
 	     
-	  
-	      
-	  
-	      
 	   
 	  </ul>
 	</section>
@@ -778,7 +710,7 @@ Markdown 的語法有個主要的目的：用來作為一種網路內容的<em>�
   
     
 
-<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
 
 </body>
