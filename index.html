@@ -82,6 +82,339 @@ $(document).ready(function(event) {
 
 	<article>
 		 <header>
+		  	<h1 class="entry-title"><a href="15510618792149.html">prometheus 安装部署</a></h1>
+			<p class="meta"><time datetime="2019-02-25T10:31:19+08:00" 
+			pubdate data-updated="true">2019/2/25</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">介绍</h2>
+
+<p>Prometheus是一套开源的监控&amp;报警&amp;时间序列数据库的组合,起始是由SoundCloud公司开发的。成立于2012年，之后许多公司和组织接受和采用prometheus,他们便将它独立成开源项目，并且有公司来运作.该项目有非常活跃的社区和开发人员，目前是独立的开源项目，任何公司都可以使用它，2016年，Prometheus加入了云计算基金会，成为kubernetes之后的第二个托管项目.google SRE的书内也曾提到跟他们BorgMon监控系统相似的实现是Prometheus。现在最常见的Kubernetes容器管理系统中，通常会搭配Prometheus进行监控。</p>
+
+<h2 id="toc_1">数据类型</h2>
+
+<h3 id="toc_2">Counter</h3>
+
+<ul>
+<li>用于累计值,请求次数,完成数等</li>
+<li>一直增加,不会减少</li>
+<li>重启后,会被重置</li>
+</ul>
+
+<h3 id="toc_3">Gauge</h3>
+
+<ul>
+<li>Gauge 常规数值, 温度变化,CPU,内存,网络变化</li>
+<li>可变大,可变小</li>
+<li>重启进程后,重置</li>
+</ul>
+
+<h3 id="toc_4">Histogram</h3>
+
+<ul>
+<li>直方图,跟踪时间发生,请求持续时间或响应时间的规模</li>
+<li>可对记录内容分组,提供 count和 sum 全部值的功能</li>
+</ul>
+
+<h3 id="toc_5">Summary</h3>
+
+<p>在prometheus中,任何可被采集的目标都被称为instance,相同类型的instance的集合被称为job</p>
+
+<pre class="line-numbers"><code class="language-text">- job: api-server
+    - instance1: 1.2.3.4:5670
+    - instance2: 1.2.3.4:5671
+    - instance3: 5.6.7.8:5670
+    - instance3: 5.6.7.8:5671
+</code></pre>
+
+<h2 id="toc_6">下载</h2>
+
+<pre class="line-numbers"><code class="language-text">wget https://github.com/prometheus/prometheus/releases/download/v2.7.1/prometheus-2.7.1.linux-amd64.tar.gz
+</code></pre>
+
+<h2 id="toc_7">安装</h2>
+
+<ul>
+<li>解压</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">tar -zxvf prometheus-2.7.1.linux-amd64.tar.gz 
+</code></pre>
+
+<ul>
+<li>创建目录</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">mv ./prometheus-2.7.1.linux-amd64 /usr/local/prometheus
+</code></pre>
+
+<ul>
+<li>创建用户和用户组</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">groupadd prometheus
+useradd -g prometheus -s /sbin/nologin prometheus
+</code></pre>
+
+<h2 id="toc_8">配置开机启动&amp;守护进程</h2>
+
+<ul>
+<li>创建文件</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text"> vim /usr/lib/systemd/system/prometheus.service
+</code></pre>
+
+<ul>
+<li>添加内容</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text"> [Unit]
+Description=Prometheus
+Documentation=https://prometheus.io/
+After=network.target
+
+[Service]
+# Type设置为notify时，服务会不断重启
+Type=simple
+User=prometheus
+# --storage.tsdb.path是可选项，默认数据目录在运行目录的./dada目录中
+ExecStart=/usr/local/prometheus/prometheus --config.file=/usr/local/prometheus/prometheus.yml --storage.tsdb.path=/var/lib/prometheus
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+
+<ul>
+<li>修改权限</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">chown prometheus:prometheus /usr/lib/systemd/system/prometheus.service
+</code></pre>
+
+<ul>
+<li>开启守护进程</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">systemctl enable prometheus
+</code></pre>
+
+<ul>
+<li>启动进程</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">systemctl start prometheus
+</code></pre>
+
+<h2 id="toc_9">使用</h2>
+
+<h3 id="toc_10">编译</h3>
+
+<ul>
+<li>下载</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">go get -u -v github.com/f1yegor/clickhouse_exporter
+</code></pre>
+
+<ul>
+<li>mac 下编译linux 系统软件</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">cd $GOPATH/github.com/f1yegor/clickhouse_exporter
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
+</code></pre>
+
+<h3 id="toc_11">启动</h3>
+
+<ul>
+<li>每台子节点机器都要添加这个任务</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">vim clickhouse_exporter.sh
+</code></pre>
+
+<ul>
+<li>添加内容</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">#!/usr/bin/env bash
+/usr/local/clickhouse_exporter/clickhouse_exporter -log.level=debug -scrape_uri=http://127.0.0.1:8123
+</code></pre>
+
+<ul>
+<li>启动脚本</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">chmod +x ./clickhouse_exporter.sh
+nohup clickhouse_exporter.sh &amp;
+</code></pre>
+
+<ul>
+<li>添加定时任务</li>
+</ul>
+
+<blockquote>
+<p>重新打开 prometheus ,修改配置文件<code>prometheus.yml</code>,增加配置<br/>
+此时,数据将会被prometheus所记录</p>
+</blockquote>
+
+<pre class="line-numbers"><code class="language-text">  - job_name: &#39;clickhouse&#39;
+    static_configs:
+    - targets: [&#39;10.0.0.1:9116&#39;]
+      labels:
+        instance: node-01
+    - targets: [&#39;10.0.0.2:9116&#39;]
+      labels:
+        instance: node-02
+    - targets: [&#39;10.0.0.3:9116&#39;]
+      labels:
+        instance: node-03
+</code></pre>
+
+<h2 id="toc_12">优化</h2>
+
+<h2 id="toc_13">总结</h2>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15490763418639.html">下拉框统一查询接口</a></h1>
+			<p class="meta"><time datetime="2019-02-02T10:59:01+08:00" 
+			pubdate data-updated="true">2019/2/2</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">描述</h2>
+
+<blockquote>
+<p>在设计数据查询后台时,经常会遇到一些下拉菜单,需要进行筛选,所以常常需要写一些数据查询接口,这样的接口写多了以后,就需要将其统一抽象起来,方便使用<br/>
+所以编写了这样一套统一api接口</p>
+</blockquote>
+
+<h3 id="toc_1">使用方法</h3>
+
+<h4 id="toc_2">请求地址</h4>
+
+<p><code>/api/fields/any</code></p>
+
+<h4 id="toc_3">请求方式</h4>
+
+<p><strong>GET</strong></p>
+
+<h4 id="toc_4">请求参数</h4>
+
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>类型</th>
+<th>描述</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>table</td>
+<td>string</td>
+<td>指定表名称,可以是抽象表</td>
+</tr>
+<tr>
+<td>field</td>
+<td>string</td>
+<td>指定要取出的字段, 可以是抽象字段</td>
+</tr>
+<tr>
+<td>type</td>
+<td>string</td>
+<td>目前只有 kv, v</td>
+</tr>
+<tr>
+<td>profiex</td>
+<td>string</td>
+<td>字段名添加统一前缀</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="toc_5">配置参数</h2>
+
+<h3 id="toc_6">前置查询</h3>
+
+<h3 id="toc_7">后置查询</h3>
+
+<h3 id="toc_8">虚拟字段</h3>
+
+<h3 id="toc_9">回调函数</h3>
+
+<h3 id="toc_10">返回格式指定</h3>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15488420618155.html">kancloud 文档下载器</a></h1>
+			<p class="meta"><time datetime="2019-01-30T17:54:21+08:00" 
+			pubdate data-updated="true">2019/1/30</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">介绍</h2>
+
+<blockquote>
+<p>最近在 <strong>kancloud(看云)</strong> 上看到一个关于 go语言的文档感觉质量非常不错,但是作者并没有开启下载功能,但我的大部分阅读时间,都是在地铁上,用ipad观看<br/>
+简单看了下看云的api, 决定用 <code>nodejs</code> + <code>gitbook</code> 制作一个 pdf下载器</p>
+</blockquote>
+
+<h2 id="toc_1">安装</h2>
+
+<blockquote>
+</blockquote>
+
+<h2 id="toc_2">使用</h2>
+
+<h2 id="toc_3">功能</h2>
+
+<h2 id="toc_4">利用 gitbook</h2>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15488420447689.html"></a></h1>
+			<p class="meta"><time datetime="2019-01-30T17:54:04+08:00" 
+			pubdate data-updated="true">2019/1/30</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
 		  	<h1 class="entry-title"><a href="15483468139816.html">go 语言类型推断</a></h1>
 			<p class="meta"><time datetime="2019-01-25T00:20:13+08:00" 
 			pubdate data-updated="true">2019/1/25</time></p>
@@ -659,6 +992,20 @@ func main() {
 	        
 	        
 	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%B7%A5%E5%85%B7.html"><strong>工具&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.html"><strong>设计模式&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
 	   
 	  </ul>
 	</section>
@@ -668,33 +1015,41 @@ func main() {
 	  
 	      
 		      <li class="post">
+		        <a href="15510618792149.html">prometheus 安装部署</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15490763418639.html">下拉框统一查询接口</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15488420618155.html">kancloud 文档下载器</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15488420447689.html"></a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
 		        <a href="15483468139816.html">go 语言类型推断</a>
 		      </li>
 	     
 	  
 	      
-		      <li class="post">
-		        <a href="15482336668160.html">应用 2：缓兵之计 —— 延时队列</a>
-		      </li>
-	     
 	  
 	      
-		      <li class="post">
-		        <a href="15481408753253.html">redis 常用配置</a>
-		      </li>
-	     
 	  
 	      
-		      <li class="post">
-		        <a href="15481372107974.html">redis 集群部署</a>
-		      </li>
-	     
 	  
 	      
-		      <li class="post">
-		        <a href="15476981952811.html">goWeb 编程</a>
-		      </li>
-	     
 	   
 	  </ul>
 	</section>

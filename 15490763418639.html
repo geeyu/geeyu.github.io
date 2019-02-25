@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <title>
     
-  redis 集群部署 - 搁羽念风
+  下拉框统一查询接口 - 搁羽念风
   
 
   </title>
@@ -81,89 +81,73 @@ $(document).ready(function(event) {
 <div>
 	<article class="hentry" role="article">
 	<header>
-			  	<h1 class="entry-title">redis 集群部署</h1>
-				<p class="meta"><time datetime="2019-01-22T14:06:50+08:00" pubdate data-updated="true">2019/1/22</time></p>
+			  	<h1 class="entry-title">下拉框统一查询接口</h1>
+				<p class="meta"><time datetime="2019-02-02T10:59:01+08:00" pubdate data-updated="true">2019/2/2</time></p>
 			 </header>
 		  	<div class="entry-content">
-			  	<h2 id="toc_0">现有的集群方式</h2>
-
-<ol>
-<li>官方集群 cluster 方式 5.0 自带</li>
-<li>twemproxy 代理方式</li>
-<li>哨兵模式</li>
-<li>codis</li>
-<li>客户端分片模式</li>
-</ol>
-
-<h2 id="toc_1">cluster 集群方式</h2>
-
-<h3 id="toc_2">安装</h3>
-
-<ol>
-<li><p>下载代码</p>
-<pre class="line-numbers"><code class="language-text">mkdir -p /apps/redis-cluster &amp; cd /apps/redis-cluster
-wget http://download.redis.io/releases/redis-5.0.3.tar.gz<br/>
-tar zxvf redis-5.0.3.tar.gz<br/>
-cd redis-5.0.3<br/>
-make<br/>
-cp ./src/redis-server ../<br/>
-cp ./src/redis-cli ../
-</code></pre></li>
-<li><p>创建一组配置文件</p></li>
-</ol>
-
-<pre class="line-numbers"><code class="language-text">mkdir 9001 9002 9003 9004 9005 9006
-</code></pre>
+			  	<h2 id="toc_0">描述</h2>
 
 <blockquote>
-<p>每个目录下写入配置</p>
+<p>在设计数据查询后台时,经常会遇到一些下拉菜单,需要进行筛选,所以常常需要写一些数据查询接口,这样的接口写多了以后,就需要将其统一抽象起来,方便使用<br/>
+所以编写了这样一套统一api接口</p>
 </blockquote>
 
-<pre class="line-numbers"><code class="language-text"># 设定端口
-port 9001
-# 开启集群
-cluster-enabled yes
-# 保存节点配置文件
-cluster-config-file &quot;nodes.conf&quot;
-# 集群节点的超时时限,默认值为 15000
-cluster-node-timeout 5000
-# 日志文件
-logfile &quot;log.log&quot; 
-# 开启数据持久化 指定是否在每次更新操作后进行日志记录
-appendonly yes
-# 数据文件
-dbfilename &quot;dump.rdb&quot;
-# 守护进程
-daemonize yes
-# 节点间同步密码
-masterauth 123456
-# 设置密码
-requirepass 123456
-</code></pre>
+<h3 id="toc_1">使用方法</h3>
 
-<blockquote>
-<p>每个目录下都执行一遍</p>
+<h4 id="toc_2">请求地址</h4>
 
-<pre class="line-numbers"><code class="language-text">cd ./9001
-../redis-server ./redis.conf
-</code></pre>
-</blockquote>
+<p><code>/api/fields/any</code></p>
 
-<h3 id="toc_3">创建集群</h3>
+<h4 id="toc_3">请求方式</h4>
 
-<blockquote>
-<p><code>--replicas 1</code> 表示,每个主节点创建一个从节点<br/>
-下面操作,将会将配置应用到各个节点,并(join)起来,让节点们互相通讯起来</p>
+<p><strong>GET</strong></p>
 
-<pre class="line-numbers"><code class="language-text">./redis-cli --cluster create 127.0.0.1:9001 127.0.0.1:9002 127.0.0.1:9003 127.0.0.1:9004 127.0.0.1:9005 127.0.0.1:9006 --cluster-replicas 1
-</code></pre>
-</blockquote>
+<h4 id="toc_4">请求参数</h4>
 
-<h3 id="toc_4">连接方式</h3>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>类型</th>
+<th>描述</th>
+</tr>
+</thead>
 
-<blockquote>
-<p><code>redis-cli -c -p 9001 -a 123456</code> </p>
-</blockquote>
+<tbody>
+<tr>
+<td>table</td>
+<td>string</td>
+<td>指定表名称,可以是抽象表</td>
+</tr>
+<tr>
+<td>field</td>
+<td>string</td>
+<td>指定要取出的字段, 可以是抽象字段</td>
+</tr>
+<tr>
+<td>type</td>
+<td>string</td>
+<td>目前只有 kv, v</td>
+</tr>
+<tr>
+<td>profiex</td>
+<td>string</td>
+<td>字段名添加统一前缀</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="toc_5">配置参数</h2>
+
+<h3 id="toc_6">前置查询</h3>
+
+<h3 id="toc_7">后置查询</h3>
+
+<h3 id="toc_8">虚拟字段</h3>
+
+<h3 id="toc_9">回调函数</h3>
+
+<h3 id="toc_10">返回格式指定</h3>
 
 			</div>
 
@@ -175,7 +159,7 @@ requirepass 123456
 			<strong>Categories:</strong>&nbsp; 
 			<span class="categories">
 			
-			    <a class='category' href='redis.html'>redis</a>&nbsp;
+			    <a class='category' href='%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.html'>设计模式</a>&nbsp;
 			 
 			</span>
 		    </p>
@@ -193,12 +177,12 @@ requirepass 123456
 
 	    <p class="meta">
 	    
-	        <a class="basic-alignment left" href="15481408753253.html" 
-	        title="Previous Post: redis 常用配置">&laquo; redis 常用配置</a>
+	        <a class="basic-alignment left" href="15510618792149.html" 
+	        title="Previous Post: prometheus 安装部署">&laquo; prometheus 安装部署</a>
 	    
 	    
-	        <a class="basic-alignment right" href="15476981952811.html" 
-	        title="Next Post: goWeb 编程">goWeb 编程 &raquo;</a>
+	        <a class="basic-alignment right" href="15488420618155.html" 
+	        title="Next Post: kancloud 文档下载器">kancloud 文档下载器 &raquo;</a>
 	    
 	    </p>
 	  </footer>
