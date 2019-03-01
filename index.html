@@ -82,6 +82,140 @@ $(document).ready(function(event) {
 
 	<article>
 		 <header>
+		  	<h1 class="entry-title"><a href="15514283796439.html">类mysql order 多值排序</a></h1>
+			<p class="meta"><time datetime="2019-03-01T16:19:39+08:00" 
+			pubdate data-updated="true">2019/3/1</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<pre class="line-numbers"><code class="language-php">
+function orderBy($data, $orders) {
+    $sorts = [
+        &#39;desc&#39; =&gt; SORT_DESC,
+        &#39;asc&#39; =&gt; SORT_ASC
+    ];
+    $tmp = [];
+    foreach ($orders as $order =&gt; $sort) {
+        $cols = array_column($data, $order);
+        if(!isset($sorts[$sort])) {
+            return $data;
+        }
+        $tmp[] = $cols;
+        $tmp[] = $sorts[$sort];
+    }
+    $tmp[] = $data;
+    call_user_func_array(&#39;array_multisort&#39;, $tmp);
+    // array_multisort($cols, $sorts[$sort], $data);
+    print_r($data);
+    return $data;
+}
+
+$data = [
+    [&#39;score&#39;=&gt;2, &#39;date&#39;=&gt;&#39;2015&#39;],
+    [&#39;score&#39;=&gt;2, &#39;date&#39;=&gt;&#39;2014&#39;],
+    [&#39;score&#39;=&gt;1, &#39;date&#39;=&gt;&#39;2017&#39;],
+    [&#39;score&#39;=&gt;3, &#39;date&#39;=&gt;&#39;2014&#39;],
+];
+
+$order = [
+    &#39;score&#39; =&gt; &#39;asc&#39;,
+    &#39;date&#39; =&gt; &#39;desc&#39;
+];
+
+
+$order = orderBy($data, $order);
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15512397780424.html">cellnet 网络框架,源码解读</a></h1>
+			<p class="meta"><time datetime="2019-02-27T11:56:18+08:00" 
+			pubdate data-updated="true">2019/2/27</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<pre class="line-numbers"><code class="language-text">├── cellnet
+│   ├── codec               // 编码格式
+│   │   └── json            // json格式编码包
+│   │       └── json.go     // json格式适配器
+│   ├── codec.go            // 编码适配器
+│   ├── internal            // 中文意思,内部,此处是内部用函数包的意思
+│   │   ├── log.go          // 记录日志,初始化
+│   │   └── sesmgr.go       // 会话管理功能的包, 包括增加,移除,获取,遍历,统计等功能
+│   ├── log.go              // 记录日志,初始化
+│   ├── meta.go             // 目标消息体
+│   ├── packet              // 封包解包库
+│   │   ├── log.go          // 记录日志,初始化
+│   │   ├── packet.go       // 核心的封包解包器,2个功能,接收变长包,发送变长包
+│   │   ├── pktreader.go    // Packet,Reader 包数据阅读器
+│   │   ├── pktwriter.go    // Packet,Writer 包数据写入器
+│   │   ├── recv.go         // 接收, length-type-value 封包数据
+│   │   ├── send.go         // 发送, length-type-value 封包数据
+│   │   └── setup.go        // 启动封包器,设定回调进程
+│   ├── peer.go             // 会话管理器
+│   ├── queue.go            // 事件循环队列
+│   ├── socket
+│   │   ├── acceptor.go     // 侦听端口,建立session,管理session,监听端口等
+│   │   ├── connector.go    // 连接器, 开始连接,结束连接,获取session
+│   │   ├── event.go        // 定义了各种事件发生时的结构体
+│   │   ├── log.go          // 记录日志,初始化
+│   │   ├── peer.go         // socket端口,名称,队列,派发事件
+│   │   └── session.go      // 原始连接,同步器,通讯端口,消息队列
+│   └── test
+│       └── test_test.go    // 测试
+└── chat
+    ├── client
+    │   └── main.go         // 客户端
+    ├── proto
+    │   └── chat.go         // 消息通讯格式
+    └── server
+        └── main.go         // 服务器
+
+</code></pre>
+
+<h2 id="toc_0">客户端分析</h2>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15511647865786.html">clickhouse 奇技淫巧</a></h1>
+			<p class="meta"><time datetime="2019-02-26T15:06:26+08:00" 
+			pubdate data-updated="true">2019/2/26</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">函数</h2>
+
+<blockquote>
+<p><code>positionCaseInsensitive</code> 不区分大小写,查找字符串的所在位置, 未找到则为0<br/>
+<code>positionCaseInsensitiveUTF8</code> 同上,不过汉字也算作一个字符<br/>
+<code>cityHash64</code> 快速哈希,规则相同<br/>
+<code>groupArray</code> 根据group 将一个或者多个字段合并成数组<br/>
+<code>intDiv</code> 整除,intDiv(时间戳, 3600)*3600 即可按照每小时分组</p>
+</blockquote>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
 		  	<h1 class="entry-title"><a href="15510618792149.html">prometheus 安装部署</a></h1>
 			<p class="meta"><time datetime="2019-02-25T10:31:19+08:00" 
 			pubdate data-updated="true">2019/2/25</time></p>
@@ -831,143 +965,9 @@ appendfsync everysec
 		
 
 	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15481372107974.html">redis 集群部署</a></h1>
-			<p class="meta"><time datetime="2019-01-22T14:06:50+08:00" 
-			pubdate data-updated="true">2019/1/22</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<h2 id="toc_0">现有的集群方式</h2>
-
-<ol>
-<li>官方集群 cluster 方式 5.0 自带</li>
-<li>twemproxy 代理方式</li>
-<li>哨兵模式</li>
-<li>codis</li>
-<li>客户端分片模式</li>
-</ol>
-
-<h2 id="toc_1">cluster 集群方式</h2>
-
-<h3 id="toc_2">安装</h3>
-
-<ol>
-<li><p>下载代码</p>
-<pre class="line-numbers"><code class="language-text">mkdir -p /apps/redis-cluster &amp; cd /apps/redis-cluster
-wget http://download.redis.io/releases/redis-5.0.3.tar.gz<br/>
-tar zxvf redis-5.0.3.tar.gz<br/>
-cd redis-5.0.3<br/>
-make<br/>
-cp ./src/redis-server ../<br/>
-cp ./src/redis-cli ../
-</code></pre></li>
-<li><p>创建一组配置文件</p></li>
-</ol>
-
-<pre class="line-numbers"><code class="language-text">mkdir 9001 9002 9003 9004 9005 9006
-</code></pre>
-
-<blockquote>
-<p>每个目录下写入配置</p>
-</blockquote>
-
-<pre class="line-numbers"><code class="language-text"># 设定端口
-port 9001
-# 开启集群
-cluster-enabled yes
-# 保存节点配置文件
-cluster-config-file &quot;nodes.conf&quot;
-# 集群节点的超时时限,默认值为 15000
-cluster-node-timeout 5000
-# 日志文件
-logfile &quot;log.log&quot; 
-# 开启数据持久化 指定是否在每次更新操作后进行日志记录
-appendonly yes
-# 数据文件
-dbfilename &quot;dump.rdb&quot;
-# 守护进程
-daemonize yes
-# 节点间同步密码
-masterauth 123456
-# 设置密码
-requirepass 123456
-</code></pre>
-
-<blockquote>
-<p>每个目录下都执行一遍</p>
-
-<pre class="line-numbers"><code class="language-text">cd ./9001
-../redis-server ./redis.conf
-</code></pre>
-</blockquote>
-
-<h3 id="toc_3">创建集群</h3>
-
-<blockquote>
-<p><code>--replicas 1</code> 表示,每个主节点创建一个从节点<br/>
-下面操作,将会将配置应用到各个节点,并(join)起来,让节点们互相通讯起来</p>
-
-<pre class="line-numbers"><code class="language-text">./redis-cli --cluster create 127.0.0.1:9001 127.0.0.1:9002 127.0.0.1:9003 127.0.0.1:9004 127.0.0.1:9005 127.0.0.1:9006 --cluster-replicas 1
-</code></pre>
-</blockquote>
-
-<h3 id="toc_4">连接方式</h3>
-
-<blockquote>
-<p><code>redis-cli -c -p 9001 -a 123456</code> </p>
-</blockquote>
-
-
-		</div>
-
-		
-
-	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15476981952811.html">goWeb 编程</a></h1>
-			<p class="meta"><time datetime="2019-01-17T12:09:55+08:00" 
-			pubdate data-updated="true">2019/1/17</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<h3 id="toc_0">正文</h3>
-
-<blockquote>
-<p>go 网络服务</p>
-</blockquote>
-
-<pre class="line-numbers"><code class="language-go">package main
-
-import (
-    &quot;net/http&quot;
-    &quot;fmt&quot;
-)
-
-func test(w http.ResponseWrite,r *http.Request) {
-    fmt.Fprintf(w, &quot;hello world %s&quot;, r.URL.Path[1:])
-}
-
-func main() {
-    http.HandleFunc(&quot;/&quot;, test)
-    http.ListenAndServe(&quot;:8080&quot;, nil)
-}
-
-</code></pre>
-
-
-		</div>
-
-		
-
-	</article>
   
 	<div class="pagination">
-	
+	 <a class="prev" href="all_1.html">&larr; Older</a> 
 <a href="archives.html">Blog Archives</a>
 	 
 	    
@@ -1001,7 +1001,21 @@ func main() {
 	      </li>
 	  
 	      <li class="post">
-	        <a href="%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.html"><strong>设计模式&nbsp;(1)</strong></a>
+	        <a href="%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.html"><strong>设计模式&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="clickhouse.html"><strong>clickhouse&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="php.html"><strong>php&nbsp;(1)</strong></a>
 	        
 	        
 	        
@@ -1012,6 +1026,24 @@ func main() {
 	<section>
 	  <h1>Recent Posts</h1>
 	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15514283796439.html">类mysql order 多值排序</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15512397780424.html">cellnet 网络框架,源码解读</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15511647865786.html">clickhouse 奇技淫巧</a>
+		      </li>
+	     
 	  
 	      
 		      <li class="post">
@@ -1026,22 +1058,10 @@ func main() {
 	     
 	  
 	      
-		      <li class="post">
-		        <a href="15488420618155.html">kancloud 文档下载器</a>
-		      </li>
-	     
 	  
 	      
-		      <li class="post">
-		        <a href="15488420447689.html"></a>
-		      </li>
-	     
 	  
 	      
-		      <li class="post">
-		        <a href="15483468139816.html">go 语言类型推断</a>
-		      </li>
-	     
 	  
 	      
 	  
