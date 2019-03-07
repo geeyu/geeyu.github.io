@@ -82,6 +82,69 @@ $(document).ready(function(event) {
 
 	<article>
 		 <header>
+		  	<h1 class="entry-title"><a href="15519281018034.html">golang 的时间库常用语法</a></h1>
+			<p class="meta"><time datetime="2019-03-07T11:08:21+08:00" 
+			pubdate data-updated="true">2019/3/7</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<pre class="line-numbers"><code class="language-text">package main
+
+import (
+    &quot;fmt&quot;
+    &quot;time&quot;
+)
+
+// 月份 1,01,Jan,January
+// 日　 2,02,_2
+// 时　 3,03,15,PM,pm,AM,am
+// 分　 4,04
+// 秒　 5,05
+// 年　 06,2006
+// 周几 Mon,Monday
+// 时区时差表示 -07,-0700,Z0700,Z07:00,-07:00,MST
+// 时区字母缩写 MST
+
+func main() {
+    fmt.Println(time.Now().Zone())               // 时区
+    fmt.Println(time.Now().UnixNano())           // 从1970年1.1 至今的纳秒数
+    fmt.Println(time.Now().UnixNano() / 1000000) // 从1970年1.1 至今的毫秒数
+    fmt.Println(time.Now().Unix())               // 从1970年1.1 至今的秒数
+
+    // 时间戳转换为 Y-m-d H:i:s
+    ttt := time.Unix(1551926194, 0) // 参数1 毫秒, 参数2 纳秒,将毫秒,纳秒转化为 time类型
+    ts := ttt.Format(&quot;2006-01-02 15:04:05&quot;)
+    fmt.Println(ts) // 将time类型转化为 Y-m-d H:i:s
+
+    tt, _ := time.Parse(&quot;2006-01-02 15:04:05&quot;, ts)
+    fmt.Println(tt.Unix())
+    tt2 := tt.Add(3 * time.Hour)  // 给当前时间向前加3小时
+    tt3 := tt.Add(-3 * time.Hour) // 给当前时间向前加3小时
+    fmt.Println(tt2.Format(&quot;2006-01-02 15:04:05&quot;))
+    fmt.Println(tt3.Format(&quot;2006-01-02 15:04:05&quot;))
+
+    tt4 := tt.AddDate(3, 3, 3) // 给当前时间增加3年3个月3天
+    fmt.Println(tt4.Format(&quot;2006-01-02 15:04:05&quot;))
+
+    // 简易的定时器
+    tick := time.Tick(1 * time.Second)
+    for t := range tick {
+        // 时间格式化转化为 标准时间段 类似于php的 Y-m-d H:i:s
+        fmt.Println(t.Format(&quot;2006-01-02 15:04:05&quot;))
+    }
+}
+
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
 		  	<h1 class="entry-title"><a href="15483468139816.html">go 语言类型推断</a></h1>
 			<p class="meta"><time datetime="2019-01-25T00:20:13+08:00" 
 			pubdate data-updated="true">2019/1/25</time></p>
@@ -256,7 +319,7 @@ func main() {
 	  <ul id="recent_posts">
 	  
 	      <li class="post">
-	        <a href="go.html"><strong>go&nbsp;(2)</strong></a>
+	        <a href="go.html"><strong>go&nbsp;(3)</strong></a>
 	        
 	        
 	        
@@ -305,6 +368,12 @@ func main() {
 	  
 	      
 		      <li class="post">
+		        <a href="15519281018034.html">golang 的时间库常用语法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
 		        <a href="15514283796439.html">类mysql order 多值排序</a>
 		      </li>
 	     
@@ -328,10 +397,6 @@ func main() {
 	     
 	  
 	      
-		      <li class="post">
-		        <a href="15490763418639.html">下拉框统一查询接口</a>
-		      </li>
-	     
 	  
 	      
 	  

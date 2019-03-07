@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <title>
     
-  go 语言类型推断 - 搁羽念风
+  golang 的时间库常用语法 - 搁羽念风
   
 
   </title>
@@ -81,116 +81,56 @@ $(document).ready(function(event) {
 <div>
 	<article class="hentry" role="article">
 	<header>
-			  	<h1 class="entry-title">go 语言类型推断</h1>
-				<p class="meta"><time datetime="2019-01-25T00:20:13+08:00" pubdate data-updated="true">2019/1/25</time></p>
+			  	<h1 class="entry-title">golang 的时间库常用语法</h1>
+				<p class="meta"><time datetime="2019-03-07T11:08:21+08:00" pubdate data-updated="true">2019/3/7</time></p>
 			 </header>
 		  	<div class="entry-content">
-			  	<h2 id="toc_0">执行之前动态确保一个结构体拥有某个方法</h2>
-
-<blockquote>
-<p>类型断言之后,只能使用接口里定义的方法<br/>
-比如 Runner 实际上有 <code>SetId</code> 和 <code>GetId</code> 两个方法<br/>
-但是 动态约束了 <code>demo.(interface{SetId(int64)})</code> 之后<br/>
-就只能使用<code>SetId</code> 这个方法了</p>
-</blockquote>
-
-<pre class="line-numbers"><code class="language-go">package main
+			  	<pre class="line-numbers"><code class="language-text">package main
 
 import (
     &quot;fmt&quot;
+    &quot;time&quot;
 )
 
-type Runner struct {
-    Num int64
-}
-
-func (self *Runner) SetId(num int64) {
-    self.Num = num
-    fmt.Println(self.Num)
-}
-
-func (self *Runner) GetId() int64 {
-    return self.Num
-}
+// 月份 1,01,Jan,January
+// 日　 2,02,_2
+// 时　 3,03,15,PM,pm,AM,am
+// 分　 4,04
+// 秒　 5,05
+// 年　 06,2006
+// 周几 Mon,Monday
+// 时区时差表示 -07,-0700,Z0700,Z07:00,-07:00,MST
+// 时区字母缩写 MST
 
 func main() {
-    var demo interface{} = new(Runner)
-    
-    demo.(interface {
-        SetId(int64)
-    }).SetId(134)
-}
+    fmt.Println(time.Now().Zone())               // 时区
+    fmt.Println(time.Now().UnixNano())           // 从1970年1.1 至今的纳秒数
+    fmt.Println(time.Now().UnixNano() / 1000000) // 从1970年1.1 至今的毫秒数
+    fmt.Println(time.Now().Unix())               // 从1970年1.1 至今的秒数
 
-</code></pre>
+    // 时间戳转换为 Y-m-d H:i:s
+    ttt := time.Unix(1551926194, 0) // 参数1 毫秒, 参数2 纳秒,将毫秒,纳秒转化为 time类型
+    ts := ttt.Format(&quot;2006-01-02 15:04:05&quot;)
+    fmt.Println(ts) // 将time类型转化为 Y-m-d H:i:s
 
-<h2 id="toc_1">利用类型断言,确定变量的类型</h2>
+    tt, _ := time.Parse(&quot;2006-01-02 15:04:05&quot;, ts)
+    fmt.Println(tt.Unix())
+    tt2 := tt.Add(3 * time.Hour)  // 给当前时间向前加3小时
+    tt3 := tt.Add(-3 * time.Hour) // 给当前时间向前加3小时
+    fmt.Println(tt2.Format(&quot;2006-01-02 15:04:05&quot;))
+    fmt.Println(tt3.Format(&quot;2006-01-02 15:04:05&quot;))
 
-<blockquote>
-<p>可以根据不同的类型,进行不同的操作</p>
-</blockquote>
+    tt4 := tt.AddDate(3, 3, 3) // 给当前时间增加3年3个月3天
+    fmt.Println(tt4.Format(&quot;2006-01-02 15:04:05&quot;))
 
-<pre class="line-numbers"><code class="language-go">package main
-
-import (
-    &quot;fmt&quot;
-)
-
-func checkType(in interface{}) {
-
-    switch value := in.(type) {
-    case int:
-        fmt.Println(&quot;int&quot;, value)
-    case string:
-        fmt.Println(&quot;string&quot;, value)
-    default:
-        fmt.Println(&quot;unknow&quot;, value)
+    // 简易的定时器
+    tick := time.Tick(1 * time.Second)
+    for t := range tick {
+        // 时间格式化转化为 标准时间段 类似于php的 Y-m-d H:i:s
+        fmt.Println(t.Format(&quot;2006-01-02 15:04:05&quot;))
     }
 }
 
-func main() {
-    ccc := 134
-    checkType(ccc)
-    ddd := &quot;133&quot;
-    checkType(ddd)
-    eee := []string{&quot;d&quot;, &quot;d&quot;, &quot;e&quot;}
-    checkType(eee)
-}
-
-</code></pre>
-
-<h2 id="toc_2">函数作为参数传递</h2>
-
-<blockquote>
-<p>函数作为参数传入 并且 被调函数, 参数类型为 interface{}时<br/>
-该函数是无法执行的<br/>
-将其进行类型转换,即可执行</p>
-</blockquote>
-
-<pre class="line-numbers"><code class="language-go">package main
-
-import &quot;fmt&quot;
-
-type Handler func(int, string, int) // 定义一个函数类型
-
-func demo(a int, b string, c int) {
-    fmt.Println(a, b, c)
-}
-
-func check(in interface{}) {
-    in.(Handler)(112, &quot;ccc&quot;, 222)
-}
-
-func main() {
-    check(Handler(demo))
-}
-</code></pre>
-
-<h2 id="toc_3">类型断言</h2>
-
-<pre class="line-numbers"><code class="language-go">x := &quot;hello world&quot;
-if v, ok := interface{}(x).(string); ok { // interface{}(x):把 x 的类型转换成 interface{}
-    fmt.Println(v)
-}
 </code></pre>
 
 			</div>
@@ -221,12 +161,9 @@ if v, ok := interface{}(x).(string); ok { // interface{}(x):把 x 的类型转�
 
 	    <p class="meta">
 	    
-	        <a class="basic-alignment left" href="15488420447689.html" 
-	        title="Previous Post: ">&laquo; </a>
 	    
-	    
-	        <a class="basic-alignment right" href="15482336668160.html" 
-	        title="Next Post: 应用 2：缓兵之计 —— 延时队列">应用 2：缓兵之计 —— 延时队列 &raquo;</a>
+	        <a class="basic-alignment right" href="15514283796439.html" 
+	        title="Next Post: 类mysql order 多值排序">类mysql order 多值排序 &raquo;</a>
 	    
 	    </p>
 	  </footer>
