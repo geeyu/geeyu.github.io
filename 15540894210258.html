@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <title>
     
-  下拉框统一查询接口 - 搁羽念风
+  php 生成uuid的统一类 - 搁羽念风
   
 
   </title>
@@ -81,73 +81,130 @@ $(document).ready(function(event) {
 <div>
 	<article class="hentry" role="article">
 	<header>
-			  	<h1 class="entry-title">下拉框统一查询接口</h1>
-				<p class="meta"><time datetime="2019-02-02T10:59:01+08:00" pubdate data-updated="true">2019/2/2</time></p>
+			  	<h1 class="entry-title">php 生成uuid的统一类</h1>
+				<p class="meta"><time datetime="2019-04-01T11:30:21+08:00" pubdate data-updated="true">2019/4/1</time></p>
 			 </header>
 		  	<div class="entry-content">
-			  	<h2 id="toc_0">描述</h2>
+			  	<pre class="line-numbers"><code class="language-php">&lt;?php
+class UUID {
+  public static function v3($namespace, $name) {
+    if(!self::is_valid($namespace)) return false;
 
-<blockquote>
-<p>在设计数据查询后台时,经常会遇到一些下拉菜单,需要进行筛选,所以常常需要写一些数据查询接口,这样的接口写多了以后,就需要将其统一抽象起来,方便使用<br/>
-所以编写了这样一套统一api接口</p>
-</blockquote>
+    // Get hexadecimal components of namespace
+    $nhex = str_replace(array(&#39;-&#39;,&#39;{&#39;,&#39;}&#39;), &#39;&#39;, $namespace);
 
-<h3 id="toc_1">使用方法</h3>
+    // Binary Value
+    $nstr = &#39;&#39;;
 
-<h4 id="toc_2">请求地址</h4>
+    // Convert Namespace UUID to bits
+    for($i = 0; $i &lt; strlen($nhex); $i+=2) {
+      $nstr .= chr(hexdec($nhex[$i].$nhex[$i+1]));
+    }
 
-<p><code>/api/fields/any</code></p>
+    // Calculate hash value
+    $hash = md5($nstr . $name);
 
-<h4 id="toc_3">请求方式</h4>
+    return sprintf(&#39;%08s-%04s-%04x-%04x-%12s&#39;,
 
-<p><strong>GET</strong></p>
+      // 32 bits for &quot;time_low&quot;
+      substr($hash, 0, 8),
 
-<h4 id="toc_4">请求参数</h4>
+      // 16 bits for &quot;time_mid&quot;
+      substr($hash, 8, 4),
 
-<table>
-<thead>
-<tr>
-<th>字段</th>
-<th>类型</th>
-<th>描述</th>
-</tr>
-</thead>
+      // 16 bits for &quot;time_hi_and_version&quot;,
+      // four most significant bits holds version number 3
+      (hexdec(substr($hash, 12, 4)) &amp; 0x0fff) | 0x3000,
 
-<tbody>
-<tr>
-<td>table</td>
-<td>string</td>
-<td>指定表名称,可以是抽象表</td>
-</tr>
-<tr>
-<td>field</td>
-<td>string</td>
-<td>指定要取出的字段, 可以是抽象字段</td>
-</tr>
-<tr>
-<td>type</td>
-<td>string</td>
-<td>目前只有 kv, v</td>
-</tr>
-<tr>
-<td>profiex</td>
-<td>string</td>
-<td>字段名添加统一前缀</td>
-</tr>
-</tbody>
-</table>
+      // 16 bits, 8 bits for &quot;clk_seq_hi_res&quot;,
+      // 8 bits for &quot;clk_seq_low&quot;,
+      // two most significant bits holds zero and one for variant DCE1.1
+      (hexdec(substr($hash, 16, 4)) &amp; 0x3fff) | 0x8000,
 
-<h2 id="toc_5">配置参数</h2>
+      // 48 bits for &quot;node&quot;
+      substr($hash, 20, 12)
+    );
+  }
 
-<h3 id="toc_6">前置查询</h3>
+  public static function v4() {
+    return sprintf(&#39;%04x%04x-%04x-%04x-%04x-%04x%04x%04x&#39;,
 
-<h3 id="toc_7">后置查询</h3>
+      // 32 bits for &quot;time_low&quot;
+      mt_rand(0, 0xffff), mt_rand(0, 0xffff),
 
-<h3 id="toc_8">虚拟字段</h3>
+      // 16 bits for &quot;time_mid&quot;
+      mt_rand(0, 0xffff),
 
-<h3 id="toc_9">回调函数</h3>
+      // 16 bits for &quot;time_hi_and_version&quot;,
+      // four most significant bits holds version number 4
+      mt_rand(0, 0x0fff) | 0x4000,
 
-<h3 id="toc_10">返回格式指定</h3>
+      // 16 bits, 8 bits for &quot;clk_seq_hi_res&quot;,
+      // 8 bits for &quot;clk_seq_low&quot;,
+      // two most significant bits holds zero and one for variant DCE1.1
+      mt_rand(0, 0x3fff) | 0x8000,
+
+      // 48 bits for &quot;node&quot;
+      mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+    );
+  }
+
+  public static function v5($namespace, $name) {
+    if(!self::is_valid($namespace)) return false;
+
+    // Get hexadecimal components of namespace
+    $nhex = str_replace(array(&#39;-&#39;,&#39;{&#39;,&#39;}&#39;), &#39;&#39;, $namespace);
+
+    // Binary Value
+    $nstr = &#39;&#39;;
+
+    // Convert Namespace UUID to bits
+    for($i = 0; $i &lt; strlen($nhex); $i+=2) {
+      $nstr .= chr(hexdec($nhex[$i].$nhex[$i+1]));
+    }
+
+    // Calculate hash value
+    $hash = sha1($nstr . $name);
+
+    return sprintf(&#39;%08s-%04s-%04x-%04x-%12s&#39;,
+
+      // 32 bits for &quot;time_low&quot;
+      substr($hash, 0, 8),
+
+      // 16 bits for &quot;time_mid&quot;
+      substr($hash, 8, 4),
+
+      // 16 bits for &quot;time_hi_and_version&quot;,
+      // four most significant bits holds version number 5
+      (hexdec(substr($hash, 12, 4)) &amp; 0x0fff) | 0x5000,
+
+      // 16 bits, 8 bits for &quot;clk_seq_hi_res&quot;,
+      // 8 bits for &quot;clk_seq_low&quot;,
+      // two most significant bits holds zero and one for variant DCE1.1
+      (hexdec(substr($hash, 16, 4)) &amp; 0x3fff) | 0x8000,
+
+      // 48 bits for &quot;node&quot;
+      substr($hash, 20, 12)
+    );
+  }
+
+  public static function is_valid($uuid) {
+    return preg_match(&#39;/^\{?[0-9a-f]{8}\-?[0-9a-f]{4}\-?[0-9a-f]{4}\-?&#39;.
+                      &#39;[0-9a-f]{4}\-?[0-9a-f]{12}\}?$/i&#39;, $uuid) === 1;
+  }
+}
+
+// Usage
+// Named-based UUID.
+
+$v3uuid = UUID::v3(&#39;1546058f-5a25-4334-85ae-e68f2a44bbaf&#39;, &#39;SomeRandomString&#39;);
+$v5uuid = UUID::v5(&#39;1546058f-5a25-4334-85ae-e68f2a44bbaf&#39;, &#39;SomeRandomString&#39;);
+
+// Pseudo-random UUID
+
+$v4uuid = UUID::v4();
+?&gt;
+</code></pre>
 
 			</div>
 
@@ -159,7 +216,7 @@ $(document).ready(function(event) {
 			<strong>Categories:</strong>&nbsp; 
 			<span class="categories">
 			
-			    <a class='category' href='%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.html'>设计模式</a>&nbsp;
+			    <a class='category' href='php.html'>php</a>&nbsp;
 			 
 			</span>
 		    </p>
@@ -177,12 +234,12 @@ $(document).ready(function(event) {
 
 	    <p class="meta">
 	    
-	        <a class="basic-alignment left" href="15510618792149.html" 
-	        title="Previous Post: prometheus 安装部署">&laquo; prometheus 安装部署</a>
+	        <a class="basic-alignment left" href="15542835215385.html" 
+	        title="Previous Post: 查询最近一段时间内不活跃用户最后的上报page页面人数占比">&laquo; 查询最近一段时间内不活跃用户最后的上报page页面人数占比</a>
 	    
 	    
-	        <a class="basic-alignment right" href="15488420618155.html" 
-	        title="Next Post: kancloud 文档下载器">kancloud 文档下载器 &raquo;</a>
+	        <a class="basic-alignment right" href="15529928360156.html" 
+	        title="Next Post: top命令常见的用法">top命令常见的用法 &raquo;</a>
 	    
 	    </p>
 	  </footer>

@@ -82,6 +82,788 @@ $(document).ready(function(event) {
 
 	<article>
 		 <header>
+		  	<h1 class="entry-title"><a href="15512397780424.html">cellnet 网络框架,源码解读</a></h1>
+			<p class="meta"><time datetime="2019-02-27T11:56:18+08:00" 
+			pubdate data-updated="true">2019/2/27</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<pre class="line-numbers"><code class="language-text">├── cellnet
+│   ├── codec               // 编码格式
+│   │   └── json            // json格式编码包
+│   │       └── json.go     // json格式适配器
+│   ├── codec.go            // 编码适配器
+│   ├── internal            // 中文意思,内部,此处是内部用函数包的意思
+│   │   ├── log.go          // 记录日志,初始化
+│   │   └── sesmgr.go       // 会话管理功能的包, 包括增加,移除,获取,遍历,统计等功能
+│   ├── log.go              // 记录日志,初始化
+│   ├── meta.go             // 目标消息体
+│   ├── packet              // 封包解包库
+│   │   ├── log.go          // 记录日志,初始化
+│   │   ├── packet.go       // 核心的封包解包器,2个功能,接收变长包,发送变长包
+│   │   ├── pktreader.go    // Packet,Reader 包数据阅读器
+│   │   ├── pktwriter.go    // Packet,Writer 包数据写入器
+│   │   ├── recv.go         // 接收, length-type-value 封包数据
+│   │   ├── send.go         // 发送, length-type-value 封包数据
+│   │   └── setup.go        // 启动封包器,设定回调进程
+│   ├── peer.go             // 会话管理器
+│   ├── queue.go            // 事件循环队列
+│   ├── socket
+│   │   ├── acceptor.go     // 侦听端口,建立session,管理session,监听端口等
+│   │   ├── connector.go    // 连接器, 开始连接,结束连接,获取session
+│   │   ├── event.go        // 定义了各种事件发生时的结构体
+│   │   ├── log.go          // 记录日志,初始化
+│   │   ├── peer.go         // socket端口,名称,队列,派发事件
+│   │   └── session.go      // 原始连接,同步器,通讯端口,消息队列
+│   └── test
+│       └── test_test.go    // 测试
+└── chat
+    ├── client
+    │   └── main.go         // 客户端
+    ├── proto
+    │   └── chat.go         // 消息通讯格式
+    └── server
+        └── main.go         // 服务器
+
+</code></pre>
+
+<h2 id="toc_0">客户端分析</h2>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15511647865786.html">clickhouse 奇技淫巧</a></h1>
+			<p class="meta"><time datetime="2019-02-26T15:06:26+08:00" 
+			pubdate data-updated="true">2019/2/26</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">函数</h2>
+
+<blockquote>
+<p><code>positionCaseInsensitive</code> 不区分大小写,查找字符串的所在位置, 未找到则为0<br/>
+<code>positionCaseInsensitiveUTF8</code> 同上,不过汉字也算作一个字符<br/>
+<code>cityHash64</code> 快速哈希,规则相同<br/>
+<code>groupArray</code> 根据group 将一个或者多个字段合并成数组<br/>
+<code>intDiv</code> 整除,intDiv(时间戳, 3600)*3600 即可按照每小时分组</p>
+</blockquote>
+
+<h2 id="toc_1">常用</h2>
+
+<blockquote>
+<p><code>optimize table 表名</code> 如果是一个 聚合类型表,那么可以将主动触发一次聚合</p>
+</blockquote>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15510618792149.html">prometheus 安装部署</a></h1>
+			<p class="meta"><time datetime="2019-02-25T10:31:19+08:00" 
+			pubdate data-updated="true">2019/2/25</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">介绍</h2>
+
+<p>Prometheus是一套开源的监控&amp;报警&amp;时间序列数据库的组合,起始是由SoundCloud公司开发的。成立于2012年，之后许多公司和组织接受和采用prometheus,他们便将它独立成开源项目，并且有公司来运作.该项目有非常活跃的社区和开发人员，目前是独立的开源项目，任何公司都可以使用它，2016年，Prometheus加入了云计算基金会，成为kubernetes之后的第二个托管项目.google SRE的书内也曾提到跟他们BorgMon监控系统相似的实现是Prometheus。现在最常见的Kubernetes容器管理系统中，通常会搭配Prometheus进行监控。</p>
+
+<h2 id="toc_1">数据类型</h2>
+
+<h3 id="toc_2">Counter</h3>
+
+<ul>
+<li>用于累计值,请求次数,完成数等</li>
+<li>一直增加,不会减少</li>
+<li>重启后,会被重置</li>
+</ul>
+
+<h3 id="toc_3">Gauge</h3>
+
+<ul>
+<li>Gauge 常规数值, 温度变化,CPU,内存,网络变化</li>
+<li>可变大,可变小</li>
+<li>重启进程后,重置</li>
+</ul>
+
+<h3 id="toc_4">Histogram</h3>
+
+<ul>
+<li>直方图,跟踪时间发生,请求持续时间或响应时间的规模</li>
+<li>可对记录内容分组,提供 count和 sum 全部值的功能</li>
+</ul>
+
+<h3 id="toc_5">Summary</h3>
+
+<p>在prometheus中,任何可被采集的目标都被称为instance,相同类型的instance的集合被称为job</p>
+
+<pre class="line-numbers"><code class="language-text">- job: api-server
+    - instance1: 1.2.3.4:5670
+    - instance2: 1.2.3.4:5671
+    - instance3: 5.6.7.8:5670
+    - instance3: 5.6.7.8:5671
+</code></pre>
+
+<h2 id="toc_6">下载</h2>
+
+<pre class="line-numbers"><code class="language-text">wget https://github.com/prometheus/prometheus/releases/download/v2.7.1/prometheus-2.7.1.linux-amd64.tar.gz
+</code></pre>
+
+<h2 id="toc_7">安装</h2>
+
+<ul>
+<li>解压</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">tar -zxvf prometheus-2.7.1.linux-amd64.tar.gz 
+</code></pre>
+
+<ul>
+<li>创建目录</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">mv ./prometheus-2.7.1.linux-amd64 /usr/local/prometheus
+</code></pre>
+
+<ul>
+<li>创建用户和用户组</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">groupadd prometheus
+useradd -g prometheus -s /sbin/nologin prometheus
+</code></pre>
+
+<h2 id="toc_8">配置开机启动&amp;守护进程</h2>
+
+<ul>
+<li>创建文件</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text"> vim /usr/lib/systemd/system/prometheus.service
+</code></pre>
+
+<ul>
+<li>添加内容</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text"> [Unit]
+Description=Prometheus
+Documentation=https://prometheus.io/
+After=network.target
+
+[Service]
+# Type设置为notify时，服务会不断重启
+Type=simple
+User=prometheus
+# --storage.tsdb.path是可选项，默认数据目录在运行目录的./dada目录中
+ExecStart=/usr/local/prometheus/prometheus --config.file=/usr/local/prometheus/prometheus.yml --storage.tsdb.path=/var/lib/prometheus
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+
+<ul>
+<li>修改权限</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">chown prometheus:prometheus /usr/lib/systemd/system/prometheus.service
+</code></pre>
+
+<ul>
+<li>开启守护进程</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">systemctl enable prometheus
+</code></pre>
+
+<ul>
+<li>启动进程</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">systemctl start prometheus
+</code></pre>
+
+<h2 id="toc_9">使用</h2>
+
+<h3 id="toc_10">编译</h3>
+
+<ul>
+<li>下载</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">go get -u -v github.com/f1yegor/clickhouse_exporter
+</code></pre>
+
+<ul>
+<li>mac 下编译linux 系统软件</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">cd $GOPATH/github.com/f1yegor/clickhouse_exporter
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
+</code></pre>
+
+<h3 id="toc_11">启动</h3>
+
+<ul>
+<li>每台子节点机器都要添加这个任务</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">vim clickhouse_exporter.sh
+</code></pre>
+
+<ul>
+<li>添加内容</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">#!/usr/bin/env bash
+/usr/local/clickhouse_exporter/clickhouse_exporter -log.level=debug -scrape_uri=http://127.0.0.1:8123
+</code></pre>
+
+<ul>
+<li>启动脚本</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">chmod +x ./clickhouse_exporter.sh
+nohup clickhouse_exporter.sh &amp;
+</code></pre>
+
+<ul>
+<li>添加定时任务</li>
+</ul>
+
+<blockquote>
+<p>重新打开 prometheus ,修改配置文件<code>prometheus.yml</code>,增加配置<br/>
+此时,数据将会被prometheus所记录</p>
+</blockquote>
+
+<pre class="line-numbers"><code class="language-text">  - job_name: &#39;clickhouse&#39;
+    static_configs:
+    - targets: [&#39;10.0.0.1:9116&#39;]
+      labels:
+        instance: node-01
+    - targets: [&#39;10.0.0.2:9116&#39;]
+      labels:
+        instance: node-02
+    - targets: [&#39;10.0.0.3:9116&#39;]
+      labels:
+        instance: node-03
+</code></pre>
+
+<h2 id="toc_12">优化</h2>
+
+<h2 id="toc_13">总结</h2>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15490763418639.html">下拉框统一查询接口</a></h1>
+			<p class="meta"><time datetime="2019-02-02T10:59:01+08:00" 
+			pubdate data-updated="true">2019/2/2</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">描述</h2>
+
+<blockquote>
+<p>在设计数据查询后台时,经常会遇到一些下拉菜单,需要进行筛选,所以常常需要写一些数据查询接口,这样的接口写多了以后,就需要将其统一抽象起来,方便使用<br/>
+所以编写了这样一套统一api接口</p>
+</blockquote>
+
+<h3 id="toc_1">使用方法</h3>
+
+<h4 id="toc_2">请求地址</h4>
+
+<p><code>/api/fields/any</code></p>
+
+<h4 id="toc_3">请求方式</h4>
+
+<p><strong>GET</strong></p>
+
+<h4 id="toc_4">请求参数</h4>
+
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>类型</th>
+<th>描述</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>table</td>
+<td>string</td>
+<td>指定表名称,可以是抽象表</td>
+</tr>
+<tr>
+<td>field</td>
+<td>string</td>
+<td>指定要取出的字段, 可以是抽象字段</td>
+</tr>
+<tr>
+<td>type</td>
+<td>string</td>
+<td>目前只有 kv, v</td>
+</tr>
+<tr>
+<td>profiex</td>
+<td>string</td>
+<td>字段名添加统一前缀</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="toc_5">配置参数</h2>
+
+<h3 id="toc_6">前置查询</h3>
+
+<h3 id="toc_7">后置查询</h3>
+
+<h3 id="toc_8">虚拟字段</h3>
+
+<h3 id="toc_9">回调函数</h3>
+
+<h3 id="toc_10">返回格式指定</h3>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15488420618155.html">kancloud 文档下载器</a></h1>
+			<p class="meta"><time datetime="2019-01-30T17:54:21+08:00" 
+			pubdate data-updated="true">2019/1/30</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">介绍</h2>
+
+<blockquote>
+<p>最近在 <strong>kancloud(看云)</strong> 上看到一个关于 go语言的文档感觉质量非常不错,但是作者并没有开启下载功能,但我的大部分阅读时间,都是在地铁上,用ipad观看<br/>
+简单看了下看云的api, 决定用 <code>nodejs</code> + <code>gitbook</code> 制作一个 pdf下载器</p>
+</blockquote>
+
+<h2 id="toc_1">安装</h2>
+
+<blockquote>
+</blockquote>
+
+<h2 id="toc_2">使用</h2>
+
+<h2 id="toc_3">功能</h2>
+
+<h2 id="toc_4">利用 gitbook</h2>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15488420447689.html"></a></h1>
+			<p class="meta"><time datetime="2019-01-30T17:54:04+08:00" 
+			pubdate data-updated="true">2019/1/30</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15483468139816.html">go 语言类型推断</a></h1>
+			<p class="meta"><time datetime="2019-01-25T00:20:13+08:00" 
+			pubdate data-updated="true">2019/1/25</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">执行之前动态确保一个结构体拥有某个方法</h2>
+
+<blockquote>
+<p>类型断言之后,只能使用接口里定义的方法<br/>
+比如 Runner 实际上有 <code>SetId</code> 和 <code>GetId</code> 两个方法<br/>
+但是 动态约束了 <code>demo.(interface{SetId(int64)})</code> 之后<br/>
+就只能使用<code>SetId</code> 这个方法了</p>
+</blockquote>
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import (
+    &quot;fmt&quot;
+)
+
+type Runner struct {
+    Num int64
+}
+
+func (self *Runner) SetId(num int64) {
+    self.Num = num
+    fmt.Println(self.Num)
+}
+
+func (self *Runner) GetId() int64 {
+    return self.Num
+}
+
+func main() {
+    var demo interface{} = new(Runner)
+    
+    demo.(interface {
+        SetId(int64)
+    }).SetId(134)
+}
+
+</code></pre>
+
+<h2 id="toc_1">利用类型断言,确定变量的类型</h2>
+
+<blockquote>
+<p>可以根据不同的类型,进行不同的操作</p>
+</blockquote>
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import (
+    &quot;fmt&quot;
+)
+
+func checkType(in interface{}) {
+
+    switch value := in.(type) {
+    case int:
+        fmt.Println(&quot;int&quot;, value)
+    case string:
+        fmt.Println(&quot;string&quot;, value)
+    default:
+        fmt.Println(&quot;unknow&quot;, value)
+    }
+}
+
+func main() {
+    ccc := 134
+    checkType(ccc)
+    ddd := &quot;133&quot;
+    checkType(ddd)
+    eee := []string{&quot;d&quot;, &quot;d&quot;, &quot;e&quot;}
+    checkType(eee)
+}
+
+</code></pre>
+
+<h2 id="toc_2">函数作为参数传递</h2>
+
+<blockquote>
+<p>函数作为参数传入 并且 被调函数, 参数类型为 interface{}时<br/>
+该函数是无法执行的<br/>
+将其进行类型转换,即可执行</p>
+</blockquote>
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import &quot;fmt&quot;
+
+type Handler func(int, string, int) // 定义一个函数类型
+
+func demo(a int, b string, c int) {
+    fmt.Println(a, b, c)
+}
+
+func check(in interface{}) {
+    in.(Handler)(112, &quot;ccc&quot;, 222)
+}
+
+func main() {
+    check(Handler(demo))
+}
+</code></pre>
+
+<h2 id="toc_3">类型断言</h2>
+
+<pre class="line-numbers"><code class="language-go">x := &quot;hello world&quot;
+if v, ok := interface{}(x).(string); ok { // interface{}(x):把 x 的类型转换成 interface{}
+    fmt.Println(v)
+}
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15482336668160.html">应用 2：缓兵之计 —— 延时队列</a></h1>
+			<p class="meta"><time datetime="2019-01-23T16:54:26+08:00" 
+			pubdate data-updated="true">2019/1/23</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>我们平时习惯于使用 Rabbitmq 和 Kafka 作为消息队列中间件，来给应用程序之间增加异步消息传递功能。这两个中间件都是专业的消息队列中间件，特性之多超出了大多数人的理解能力。</p>
+
+<p>使用过 Rabbitmq 的同学知道它使用起来有多复杂，发消息之前要创建 Exchange，再创建 Queue，还要将 Queue 和 Exchange 通过某种规则绑定起来，发消息的时候要指定 routing-key，还要控制头部信息。消费者在消费消息之前也要进行上面一系列的繁琐过程。但是绝大多数情况下，虽然我们的消息队列只有一组消费者，但还是需要经历上面这些繁琐的过程。</p>
+
+<p>有了 Redis，它就可以让我们解脱出来，对于那些只有一组消费者的消息队列，使用 Redis 就可以非常轻松的搞定。Redis 的消息队列不是专业的消息队列，它没有非常多的高级特性，没有 ack 保证，如果对消息的可靠性有着极致的追求，那么它就不适合使用。</p>
+
+<h2 id="toc_0">异步消息队列</h2>
+
+<p>Redis 的 list(列表) 数据结构常用来作为异步消息队列使用，使用<code>rpush/lpush</code>操作入队列，使用<code>lpop 和 rpop</code>来出队列。</p>
+
+<p><img src="https://user-gold-cdn.xitu.io/2018/7/10/1648229e1dbfd776?w=862&amp;h=179&amp;f=png&amp;s=17012" alt=""/></p>
+
+<pre class="line-numbers"><code class="language-text">&gt; rpush notify-queue apple banana pear
+(integer) 3
+&gt; llen notify-queue
+(integer) 3
+&gt; lpop notify-queue
+&quot;apple&quot;
+&gt; llen notify-queue
+(integer) 2
+&gt; lpop notify-queue
+&quot;banana&quot;
+&gt; llen notify-queue
+(integer) 1
+&gt; lpop notify-queue
+&quot;pear&quot;
+&gt; llen notify-queue
+(integer) 0
+&gt; lpop notify-queue
+(nil)
+</code></pre>
+
+<p>上面是 rpush 和 lpop 结合使用的例子。还可以使用 lpush 和 rpop 结合使用，效果是一样的。这里不再赘述。</p>
+
+<h2 id="toc_1">队列空了怎么办？</h2>
+
+<p>客户端是通过队列的 pop 操作来获取消息，然后进行处理。处理完了再接着获取消息，再进行处理。如此循环往复，这便是作为队列消费者的客户端的生命周期。</p>
+
+<p>可是如果队列空了，客户端就会陷入 pop 的死循环，不停地 pop，没有数据，接着再 pop，又没有数据。这就是浪费生命的空轮询。空轮询不但拉高了客户端的 CPU，redis 的 QPS 也会被拉高，如果这样空轮询的客户端有几十来个，Redis 的慢查询可能会显著增多。</p>
+
+<p>通常我们使用 sleep 来解决这个问题，让线程睡一会，睡个 1s 钟就可以了。不但客户端的 CPU 能降下来，Redis 的 QPS 也降下来了。</p>
+
+<pre class="line-numbers"><code class="language-text">time.sleep(1) # python 睡 1s
+Thread.sleep(1000) # java 睡 1s
+</code></pre>
+
+<p><img src="https://user-gold-cdn.xitu.io/2018/7/10/164822ccec7ccb85?w=808&amp;h=266&amp;f=png&amp;s=31608" alt=""/></p>
+
+<h2 id="toc_2">队列延迟</h2>
+
+<p>用上面睡眠的办法可以解决问题。但是有个小问题，那就是睡眠会导致消息的延迟增大。如果只有 1 个消费者，那么这个延迟就是 1s。如果有多个消费者，这个延迟会有所下降，因为每个消费者的睡觉时间是岔开来的。</p>
+
+<p>有没有什么办法能显著降低延迟呢？你当然可以很快想到：那就把睡觉的时间缩短点。这种方式当然可以，不过有没有更好的解决方案呢？当然也有，那就是 blpop/brpop。</p>
+
+<p>这两个指令的前缀字符<code>b</code>代表的是<code>blocking</code>，也就是阻塞读。</p>
+
+<p>阻塞读在队列没有数据的时候，会立即进入休眠状态，一旦数据到来，则立刻醒过来。消息的延迟几乎为零。用<code>blpop/brpop</code>替代前面的<code>lpop/rpop</code>，就完美解决了上面的问题。</p>
+
+<h2 id="toc_3">空闲连接自动断开</h2>
+
+<p>你以为上面的方案真的很完美么？先别急着开心，其实他还有个问题需要解决。</p>
+
+<p>什么问题？—— <strong>空闲连接</strong>的问题。</p>
+
+<p>如果线程一直阻塞在哪里，Redis 的客户端连接就成了闲置连接，闲置过久，服务器一般会主动断开连接，减少闲置资源占用。这个时候<code>blpop/brpop</code>会抛出异常来。</p>
+
+<p>所以编写客户端消费者的时候要小心，注意捕获异常，还要重试。</p>
+
+<h2 id="toc_4">锁冲突处理</h2>
+
+<p>上节课我们讲了分布式锁的问题，但是没有提到客户端在处理请求时加锁没加成功怎么办。一般有 3 种策略来处理加锁失败：</p>
+
+<ol>
+<li>直接抛出异常，通知用户稍后重试；</li>
+<li>sleep 一会再重试；</li>
+<li>将请求转移至延时队列，过一会再试；</li>
+</ol>
+
+<p><strong>直接抛出特定类型的异常</strong></p>
+
+<p>这种方式比较适合由用户直接发起的请求，用户看到错误对话框后，会先阅读对话框的内容，再点击重试，这样就可以起到人工延时的效果。如果考虑到用户体验，可以由前端的代码替代用户自己来进行延时重试控制。它本质上是对当前请求的放弃，由用户决定是否重新发起新的请求。</p>
+
+<p><strong>sleep</strong></p>
+
+<p>sleep 会阻塞当前的消息处理线程，会导致队列的后续消息处理出现延迟。如果碰撞的比较频繁或者队列里消息比较多，sleep 可能并不合适。如果因为个别死锁的 key 导致加锁不成功，线程会彻底堵死，导致后续消息永远得不到及时处理。</p>
+
+<p><strong>延时队列</strong></p>
+
+<p>这种方式比较适合异步消息处理，将当前冲突的请求扔到另一个队列延后处理以避开冲突。</p>
+
+<h2 id="toc_5">延时队列的实现</h2>
+
+<p>延时队列可以通过 Redis 的 zset(有序列表) 来实现。我们将消息序列化成一个字符串作为 zset 的<code>value</code>，这个消息的到期处理时间作为<code>score</code>，然后用多个线程轮询 zset 获取到期的任务进行处理，多个线程是为了保障可用性，万一挂了一个线程还有其它线程可以继续处理。因为有多个线程，所以需要考虑并发争抢任务，确保任务不能被多次执行。</p>
+
+<pre class="line-numbers"><code class="language-python">def delay(msg):
+ msg.id = str(uuid.uuid4()) # 保证 value 值唯一
+ value = json.dumps(msg)
+ retry_ts = time.time() + 5 # 5 秒后重试
+ redis.zadd(&quot;delay-queue&quot;, retry_ts, value)
+
+
+def loop():
+ while True:
+ # 最多取 1 条
+ values = redis.zrangebyscore(&quot;delay-queue&quot;, 0, time.time(), start=0, num=1)
+ if not values:
+ time.sleep(1) # 延时队列空的，休息 1s
+ continue
+ value = values[0] # 拿第一条，也只有一条
+ success = redis.zrem(&quot;delay-queue&quot;, value) # 从消息队列中移除该消息
+ if success: # 因为有多进程并发的可能，最终只会有一个进程可以抢到消息
+ msg = json.loads(value)
+ handle_msg(msg)
+</code></pre>
+
+<p>Redis 的 zrem 方法是多线程多进程争抢任务的关键，它的返回值决定了当前实例有没有抢到任务，因为 loop 方法可能会被多个线程、多个进程调用，同一个任务可能会被多个进程线程抢到，通过 zrem 来决定唯一的属主。</p>
+
+<p>同时，我们要注意一定要对 handle_msg 进行异常捕获，避免因为个别任务处理问题导致循环异常退出。以下是 Java 版本的延时队列实现，因为要使用到 Json 序列化，所以还需要 fastjson 库的支持。</p>
+
+<pre class="line-numbers"><code class="language-java">import java.lang.reflect.Type;
+import java.util.Set;
+import java.util.UUID;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
+
+import redis.clients.jedis.Jedis;
+
+public class RedisDelayingQueue&lt;T&gt; {
+    
+     static class TaskItem&lt;T&gt; {
+     public String id;
+     public T msg;
+     }
+    
+     // fastjson 序列化对象中存在 generic 类型时，需要使用 TypeReference
+     private Type TaskType = new TypeReference&lt;TaskItem&lt;T&gt;&gt;() {
+     }.getType();
+    
+     private Jedis jedis;
+     private String queueKey;
+    
+     public RedisDelayingQueue(Jedis jedis, String queueKey) {
+     this.jedis = jedis;
+     this.queueKey = queueKey;
+     }
+    
+     public void delay(T msg) {
+     TaskItem&lt;T&gt; task = new TaskItem&lt;T&gt;();
+     task.id = UUID.randomUUID().toString(); // 分配唯一的 uuid
+     task.msg = msg;
+     String s = JSON.toJSONString(task); // fastjson 序列化
+     jedis.zadd(queueKey, System.currentTimeMillis() + 5000, s); // 塞入延时队列 ,5s 后再试
+     }
+    
+     public void loop() {
+     while (!Thread.interrupted()) {
+     // 只取一条
+     Set&lt;String&gt; values = jedis.zrangeByScore(queueKey, 0, System.currentTimeMillis(), 0, 1);
+     if (values.isEmpty()) {
+     try {
+     Thread.sleep(500); // 歇会继续
+     } catch (InterruptedException e) {
+     break;
+     }
+     continue;
+     }
+     String s = values.iterator().next();
+     if (jedis.zrem(queueKey, s) &gt; 0) { // 抢到了
+     TaskItem&lt;T&gt; task = JSON.parseObject(s, TaskType); // fastjson 反序列化
+     this.handleMsg(task.msg);
+     }
+     }
+     }
+    
+     public void handleMsg(T msg) {
+     System.out.println(msg);
+     }
+    
+     public static void main(String[] args) {
+     Jedis jedis = new Jedis();
+     RedisDelayingQueue&lt;String&gt; queue = new RedisDelayingQueue&lt;&gt;(jedis, &quot;q-demo&quot;);
+     Thread producer = new Thread() {
+         public void run() {
+         for (int i = 0; i &lt; 10; i++) {
+         queue.delay(&quot;codehole&quot; + i);
+     }
+     }
+        
+     };
+     Thread consumer = new Thread() {
+    
+     public void run() {
+     queue.loop();
+ }
+    
+ };
+     producer.start();
+     consumer.start();
+     try {
+     producer.join();
+     Thread.sleep(6000);
+     consumer.interrupt();
+     consumer.join();
+ } catch (InterruptedException e) {
+    
+ }
+ }
+}
+</code></pre>
+
+<h2 id="toc_6">进一步优化</h2>
+
+<p>上面的算法中同一个任务可能会被多个进程取到之后再使用 zrem 进行争抢，那些没抢到的进程都是白取了一次任务，这是浪费。可以考虑使用 lua scripting 来优化一下这个逻辑，将 zrangebyscore 和 zrem 一同挪到服务器端进行原子化操作，这样多个进程之间争抢任务时就不会出现这种浪费了。</p>
+
+<h2 id="toc_7">思考</h2>
+
+<hr/>
+
+<ol>
+<li>Redis 作为消息队列为什么不能保证 100% 的可靠性？</li>
+<li>使用 Lua Scripting 来优化延时队列的逻辑。</li>
+</ol>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
 		  	<h1 class="entry-title"><a href="15481408753253.html">redis 常用配置</a></h1>
 			<p class="meta"><time datetime="2019-01-22T15:07:55+08:00" 
 			pubdate data-updated="true">2019/1/22</time></p>
@@ -231,48 +1013,9 @@ requirepass 123456
 		
 
 	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15476981952811.html">goWeb 编程</a></h1>
-			<p class="meta"><time datetime="2019-01-17T12:09:55+08:00" 
-			pubdate data-updated="true">2019/1/17</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<h3 id="toc_0">正文</h3>
-
-<blockquote>
-<p>go 网络服务</p>
-</blockquote>
-
-<pre class="line-numbers"><code class="language-go">package main
-
-import (
-    &quot;net/http&quot;
-    &quot;fmt&quot;
-)
-
-func test(w http.ResponseWrite,r *http.Request) {
-    fmt.Fprintf(w, &quot;hello world %s&quot;, r.URL.Path[1:])
-}
-
-func main() {
-    http.HandleFunc(&quot;/&quot;, test)
-    http.ListenAndServe(&quot;:8080&quot;, nil)
-}
-
-</code></pre>
-
-
-		</div>
-
-		
-
-	</article>
   
 	<div class="pagination">
-	
+	 <a class="prev" href="all_2.html">&larr; Older</a> 
 <a href="archives.html">Blog Archives</a>
 	 <a class="next" href="all.html">Newer &rarr;</a>  
 	    
@@ -313,14 +1056,28 @@ func main() {
 	      </li>
 	  
 	      <li class="post">
-	        <a href="clickhouse.html"><strong>clickhouse&nbsp;(1)</strong></a>
+	        <a href="clickhouse.html"><strong>clickhouse&nbsp;(4)</strong></a>
 	        
 	        
 	        
 	      </li>
 	  
 	      <li class="post">
-	        <a href="php.html"><strong>php&nbsp;(1)</strong></a>
+	        <a href="php.html"><strong>php&nbsp;(4)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%9E%B6%E6%9E%84.html"><strong>架构&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%BF%90%E7%BB%B4.html"><strong>运维&nbsp;(1)</strong></a>
 	        
 	        
 	        
@@ -334,33 +1091,47 @@ func main() {
 	  
 	      
 		      <li class="post">
-		        <a href="15519281018034.html">golang 的时间库常用语法</a>
+		        <a href="15553150635573.html">给clickhouse 物化视图增加字段</a>
 		      </li>
 	     
 	  
 	      
 		      <li class="post">
-		        <a href="15514283796439.html">类mysql order 多值排序</a>
+		        <a href="15548815336055.html">php相关函数</a>
 		      </li>
 	     
 	  
 	      
 		      <li class="post">
-		        <a href="15512397780424.html">cellnet 网络框架,源码解读</a>
+		        <a href="15543440484929.html">查看表占用磁盘空间大小</a>
 		      </li>
 	     
 	  
 	      
 		      <li class="post">
-		        <a href="15511647865786.html">clickhouse 奇技淫巧</a>
+		        <a href="15542835215385.html">查询最近一段时间内不活跃用户最后的上报page页面人数占比</a>
 		      </li>
 	     
 	  
 	      
 		      <li class="post">
-		        <a href="15510618792149.html">prometheus 安装部署</a>
+		        <a href="15540894210258.html">php 生成uuid的统一类</a>
 		      </li>
 	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
 	  
 	      
 	  

@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <title>
     
-  下拉框统一查询接口 - 搁羽念风
+  php相关函数 - 搁羽念风
   
 
   </title>
@@ -81,73 +81,49 @@ $(document).ready(function(event) {
 <div>
 	<article class="hentry" role="article">
 	<header>
-			  	<h1 class="entry-title">下拉框统一查询接口</h1>
-				<p class="meta"><time datetime="2019-02-02T10:59:01+08:00" pubdate data-updated="true">2019/2/2</time></p>
+			  	<h1 class="entry-title">php相关函数</h1>
+				<p class="meta"><time datetime="2019-04-10T15:32:13+08:00" pubdate data-updated="true">2019/4/10</time></p>
 			 </header>
 		  	<div class="entry-content">
-			  	<h2 id="toc_0">描述</h2>
+			  	<h3 id="toc_0">umask() 函数,改变umask值,使进程权限保持一致</h3>
 
-<blockquote>
-<p>在设计数据查询后台时,经常会遇到一些下拉菜单,需要进行筛选,所以常常需要写一些数据查询接口,这样的接口写多了以后,就需要将其统一抽象起来,方便使用<br/>
-所以编写了这样一套统一api接口</p>
-</blockquote>
+<pre class="line-numbers"><code class="language-text">编写linux守护进程的时候,需要设置umask 这个值,用户权限屏蔽位, 
+当用户创建目录或者文件的时候,会有一个预设的权限 r=4,w=2,x=1
+目录的预设权限是：0777 drwxrwxrwx
+文件的预设权限为: 0666 -rw-rw-rw-
 
-<h3 id="toc_1">使用方法</h3>
+用这个权限减去 umask的权限,就是新建的目录或者文件的实际权限了
+umask 默认值为  0022
+新建文件夹权限为  0777 - 0022 = 0755
+新建文件权限为   0666 - 0022 = 0644
+</code></pre>
 
-<h4 id="toc_2">请求地址</h4>
+<h3 id="toc_1">pcntl_fork() 函数,在进程的当前位置产生分支(子进程)</h3>
 
-<p><code>/api/fields/any</code></p>
+<p>在当前进程的当前位置 产生分支(子进程), 都从fork位置继续执行, <br/>
+成功时<br/>
+    父进程执行过程中得到的fork返回值为子进程号,子进程得到的是0<br/>
+失败时<br/>
+    父进程将会返回 -1,不会创建子进程,并引发一个php错误</p>
 
-<h4 id="toc_3">请求方式</h4>
+<h3 id="toc_2">posix_setsid() 新建一个session终端,脱离原有终端的控制</h3>
 
-<p><strong>GET</strong></p>
+<p>成功时<br/>
+    返回 session_id<br/>
+失败时<br/>
+    返回 -1</p>
 
-<h4 id="toc_4">请求参数</h4>
+<h3 id="toc_3">php_sapi_name() 判断运行时环境</h3>
 
-<table>
-<thead>
-<tr>
-<th>字段</th>
-<th>类型</th>
-<th>描述</th>
-</tr>
-</thead>
+<h3 id="toc_4">extension_loaded() 检查一个扩展是否已经加载</h3>
 
-<tbody>
-<tr>
-<td>table</td>
-<td>string</td>
-<td>指定表名称,可以是抽象表</td>
-</tr>
-<tr>
-<td>field</td>
-<td>string</td>
-<td>指定要取出的字段, 可以是抽象字段</td>
-</tr>
-<tr>
-<td>type</td>
-<td>string</td>
-<td>目前只有 kv, v</td>
-</tr>
-<tr>
-<td>profiex</td>
-<td>string</td>
-<td>字段名添加统一前缀</td>
-</tr>
-</tbody>
-</table>
+<h3 id="toc_5">cli_set_process_title()</h3>
 
-<h2 id="toc_5">配置参数</h2>
-
-<h3 id="toc_6">前置查询</h3>
-
-<h3 id="toc_7">后置查询</h3>
-
-<h3 id="toc_8">虚拟字段</h3>
-
-<h3 id="toc_9">回调函数</h3>
-
-<h3 id="toc_10">返回格式指定</h3>
+<p>为进程设定title <br/>
+成功时<br/>
+    返回 true<br/>
+失败时<br/>
+    返回 false</p>
 
 			</div>
 
@@ -159,7 +135,7 @@ $(document).ready(function(event) {
 			<strong>Categories:</strong>&nbsp; 
 			<span class="categories">
 			
-			    <a class='category' href='%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.html'>设计模式</a>&nbsp;
+			    <a class='category' href='php.html'>php</a>&nbsp;
 			 
 			</span>
 		    </p>
@@ -177,12 +153,12 @@ $(document).ready(function(event) {
 
 	    <p class="meta">
 	    
-	        <a class="basic-alignment left" href="15510618792149.html" 
-	        title="Previous Post: prometheus 安装部署">&laquo; prometheus 安装部署</a>
+	        <a class="basic-alignment left" href="15553150635573.html" 
+	        title="Previous Post: 给clickhouse 物化视图增加字段">&laquo; 给clickhouse 物化视图增加字段</a>
 	    
 	    
-	        <a class="basic-alignment right" href="15488420618155.html" 
-	        title="Next Post: kancloud 文档下载器">kancloud 文档下载器 &raquo;</a>
+	        <a class="basic-alignment right" href="15543440484929.html" 
+	        title="Next Post: 查看表占用磁盘空间大小">查看表占用磁盘空间大小 &raquo;</a>
 	    
 	    </p>
 	  </footer>
