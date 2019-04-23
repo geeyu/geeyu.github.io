@@ -82,6 +82,231 @@ $(document).ready(function(event) {
 
 	<article>
 		 <header>
+		  	<h1 class="entry-title"><a href="15560194068510.html">resful 最佳实践</a></h1>
+			<p class="meta"><time datetime="2019-04-23T19:36:46+08:00" 
+			pubdate data-updated="true">2019/4/23</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">url设计</h2>
+
+<ol>
+<li>推荐使用复数名词 <code>/employees/21</code></li>
+<li>在资源集合URL 上使用GET方法,更加直观 <code>GET  /employees?state=external</code></li>
+<li>对特定资源进行过滤, 将搜索字符串附加到查询参数中即可 <code>GET /employees?state=internal</code></li>
+</ol>
+
+<h2 id="toc_1">使用http方法操作资源(CURD)</h2>
+
+<blockquote>
+<p>这种方式可以用简洁的方式获取7种操作资源的方式<br/>
+如果一个请求是 indempotent(即发送两个一样的请求,后一个会覆盖前一个),此时使用PUT方法,否则使用POST方法</p>
+</blockquote>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Post(创建)</th>
+<th>GET(读取)</th>
+<th>PUT(更新)</th>
+<th>DELETE(删除)</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>/employees</td>
+<td>创建</td>
+<td>列出</td>
+<td>批量更新</td>
+<td>删除所有</td>
+</tr>
+<tr>
+<td>/employees/56</td>
+<td>X</td>
+<td>获取56号员工的信息</td>
+<td>更新56号员工的信息</td>
+<td>删除56号员工的信息</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="toc_2">非资源请求用动词</h2>
+
+<blockquote>
+<p>使用动词来区分资源和非资源,url中使用动词而非名词 <code>GET /translate?from=de_DE&amp;to=en_US&amp;text=Hallo</code><br/>
+增加资源动作控制参数 <code>PUT /articles/id?published=true</code><br/>
+把动作转换为一个可以操作的资源 例如github,&quot;喜欢&quot;一个gist,转换为增加一个<code>/gists/id/star</code>子资源,对其操作 <code>PUT /gists/id/star</code>,<code>DELETE /gists/:id/star</code></p>
+</blockquote>
+
+<h2 id="toc_3">使用标准 http 响应码</h2>
+
+<h3 id="toc_4">请求成功:</h3>
+
+<ul>
+<li>200 OK: 请求已成功,Body有返回内容, 用于 GET Method 的API 返回码</li>
+<li>201 Created: 请求已经被实现,资源被创建. 用于 POST Method的同步类型API返回码</li>
+<li>202 Accepted: 服务器已经接受请求,但尚未处理. 用于 POST Method的异步类型API返回码</li>
+<li>204 No Content: 服务器成功处理了请求,但没有返回任何内容, 用于 DELETE/PUT Method 的API的返回码</li>
+</ul>
+
+<h3 id="toc_5">因为客户端原因导致请求失败:</h3>
+
+<ul>
+<li>400 Bad Request: 如参数错误,格式错误</li>
+<li>401 Unauthorized: 用户未被认证, 如果密码错误,证书错误</li>
+<li>403 Forbidden: 用户权限不够</li>
+<li>404 Not Found: 服务器无此资源, 通常为URL不存在,或者某个Method不存在</li>
+<li>409 Conflict: 请求存在冲突,无法处理该请求 (比如某个资源禁止被再次修改,但请求想修改该资源,就要返回409)</li>
+</ul>
+
+<h3 id="toc_6">因服务端原因导致请求失败:</h3>
+
+<ul>
+<li>500 Internal Server Error: 服务端错误消息,服务器遇到一个未曾预料的状况</li>
+<li>501 Not Implemented: 服务器不支持当前请求所需要的某个功能</li>
+<li>503 Service Unavailable: 如服务器维护中或者过载等</li>
+</ul>
+
+<h2 id="toc_7">返回有用的提示信息</h2>
+
+<h3 id="toc_8">除了合适的状态码之外,还应当在正文中提供有用的错误提示和详细的描述</h3>
+
+<pre class="line-numbers"><code class="language-javascript">   // 400 Bad Request
+   {
+    &quot;message&quot;: &quot;You submitted an invalid state. Valid state values are &#39;internal&#39; or &#39;external&#39;&quot;,
+    &quot;errorCode&quot;: 352,
+    &quot;additionalInformation&quot; :&quot;http://www.domain.com/rest/errorcode/352&quot;
+   }
+</code></pre>
+
+<h3 id="toc_9">响应中提供浏览其他API的链接</h3>
+
+<blockquote>
+<p>如,在响应参数中添加一个 links 字段，让客户端可以自动变更,也可以自我描述,需要提供的文档更少</p>
+</blockquote>
+
+<pre class="line-numbers"><code class="language-javascript">{
+  &quot;id&quot;:1,
+  &quot;name&quot;:&quot;Paul&quot;,
+  &quot;links&quot;: [
+     {
+        &quot;rel&quot;: &quot;salary&quot;,
+        &quot;href&quot;: &quot;/employees/1/salaryStatements&quot;
+     }
+  ]
+}
+</code></pre>
+
+<h3 id="toc_10">提供分页信息</h3>
+
+<blockquote>
+<p>资源较多时,可以用 <code>page</code>,<code>page_size</code> 来提供分页 <code>/employees?page=30&amp;page_size=15 #返回 30 到 45 的员工</code><br/>
+还可以添加上一页和下一页的链接示例</p>
+</blockquote>
+
+<pre class="line-numbers"><code class="language-text">   GET /employees?offset=20&amp;limit=10
+   {
+   &quot;offset&quot;: 20,
+   &quot;limit&quot;: 10,
+   &quot;total&quot;: 3465,
+   &quot;employees&quot;: [
+    //...
+   ],
+   &quot;links&quot;: [
+     {
+        &quot;rel&quot;: &quot;nextPage&quot;,
+        &quot;href&quot;: &quot;/employees?offset=30&amp;limit=10&quot;
+     },
+     {
+        &quot;rel&quot;: &quot;previousPage&quot;,
+        &quot;href&quot;: &quot;/employees?offset=10&amp;limit=10&quot;
+     }
+   ]
+   }
+</code></pre>
+
+<h2 id="toc_11">使用https</h2>
+
+<blockquote>
+<p>禁止非ssl的url重定向到ssl的url</p>
+</blockquote>
+
+<h2 id="toc_12">授权</h2>
+
+<ul>
+<li>验证(Authentication) 为了确定用户申明的身份</li>
+<li>授权(Authorization) 为用户增加某个资源的操作权限</li>
+</ul>
+
+<h2 id="toc_13">Location</h2>
+
+<p>在响应的header中使用,一般为客户端感兴趣的资源url,如果成功创建一个资源后,把新资源url放在Location中<br/>
+异步创建请求,也可以在响应 202的同时,添加一个可以异步状态查询的地址</p>
+
+<h2 id="toc_14">API地址</h2>
+
+<p>在url中指定API的版本号 <code>https://api.github.com/v3</code><br/>
+如果api变化很大,可以把api设计为子域名 <code>https://v3.api.demo.com</code><br/>
+不需要次级版本,只有当接口不兼容,才应该变更版本号</p>
+
+<h3 id="toc_15">两种实现方式</h3>
+
+<ul>
+<li> url中 如<code>https://example.com/api/v1</code>, 
+<ul>
+<li>版本明确,方便调试</li>
+<li>不同版本协议解析可以放在不同的服务器上</li>
+<li>不用考虑协议兼容性,开发简便,升级不受影响</li>
+</ul></li>
+<li>HTTP Header 中
+<ul>
+<li>url简洁干净,符合RESTful惯例</li>
+</ul></li>
+</ul>
+
+<h2 id="toc_16">连字符</h2>
+
+<p>url 中应该尽量使用 &quot;-&quot; 来代替下划线&quot;_&quot;的使用,如<br/>
+<code>http://api.example.restapi.org/blogs/mark-masse/entries/this-is-my-first-post</code></p>
+
+<h2 id="toc_17">大小写</h2>
+
+<p>根据 RFC3986 定义，URI 是对大小写敏感的，所以为了避免歧义，我们尽量用小写字符</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15554074466566.html">git 一些常用的命令</a></h1>
+			<p class="meta"><time datetime="2019-04-16T17:37:26+08:00" 
+			pubdate data-updated="true">2019/4/16</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">删除错误的提交</h2>
+
+<pre class="line-numbers"><code class="language-text">// 重置改动到 某次提交
+git reset commit_id
+// 强制push, 远程的commit_id 之后的push将会被删掉
+git push --force
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
 		  	<h1 class="entry-title"><a href="15553150635573.html">给clickhouse 物化视图增加字段</a></h1>
 			<p class="meta"><time datetime="2019-04-15T15:57:43+08:00" 
 			pubdate data-updated="true">2019/4/15</time></p>
@@ -525,122 +750,6 @@ while (true) {
 		
 
 	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15519281018034.html">golang 的时间库常用语法</a></h1>
-			<p class="meta"><time datetime="2019-03-07T11:08:21+08:00" 
-			pubdate data-updated="true">2019/3/7</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<pre class="line-numbers"><code class="language-text">package main
-
-import (
-    &quot;fmt&quot;
-    &quot;time&quot;
-)
-
-// 月份 1,01,Jan,January
-// 日　 2,02,_2
-// 时　 3,03,15,PM,pm,AM,am
-// 分　 4,04
-// 秒　 5,05
-// 年　 06,2006
-// 周几 Mon,Monday
-// 时区时差表示 -07,-0700,Z0700,Z07:00,-07:00,MST
-// 时区字母缩写 MST
-
-func main() {
-    fmt.Println(time.Now().Zone())               // 时区
-    fmt.Println(time.Now().UnixNano())           // 从1970年1.1 至今的纳秒数
-    fmt.Println(time.Now().UnixNano() / 1000000) // 从1970年1.1 至今的毫秒数
-    fmt.Println(time.Now().Unix())               // 从1970年1.1 至今的秒数
-
-    // 时间戳转换为 Y-m-d H:i:s
-    ttt := time.Unix(1551926194, 0) // 参数1 毫秒, 参数2 纳秒,将毫秒,纳秒转化为 time类型
-    ts := ttt.Format(&quot;2006-01-02 15:04:05&quot;)
-    fmt.Println(ts) // 将time类型转化为 Y-m-d H:i:s
-
-    tt, _ := time.Parse(&quot;2006-01-02 15:04:05&quot;, ts)
-    fmt.Println(tt.Unix())
-    tt2 := tt.Add(3 * time.Hour)  // 给当前时间向前加3小时
-    tt3 := tt.Add(-3 * time.Hour) // 给当前时间向前加3小时
-    fmt.Println(tt2.Format(&quot;2006-01-02 15:04:05&quot;))
-    fmt.Println(tt3.Format(&quot;2006-01-02 15:04:05&quot;))
-
-    tt4 := tt.AddDate(3, 3, 3) // 给当前时间增加3年3个月3天
-    fmt.Println(tt4.Format(&quot;2006-01-02 15:04:05&quot;))
-
-    // 简易的定时器
-    tick := time.Tick(1 * time.Second)
-    for t := range tick {
-        // 时间格式化转化为 标准时间段 类似于php的 Y-m-d H:i:s
-        fmt.Println(t.Format(&quot;2006-01-02 15:04:05&quot;))
-    }
-}
-
-</code></pre>
-
-
-		</div>
-
-		
-
-	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15514283796439.html">类mysql order 多值排序</a></h1>
-			<p class="meta"><time datetime="2019-03-01T16:19:39+08:00" 
-			pubdate data-updated="true">2019/3/1</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<pre class="line-numbers"><code class="language-php">
-function orderBy($data, $orders) {
-    $sorts = [
-        &#39;desc&#39; =&gt; SORT_DESC,
-        &#39;asc&#39; =&gt; SORT_ASC
-    ];
-    $tmp = [];
-    foreach ($orders as $order =&gt; $sort) {
-        $cols = array_column($data, $order);
-        if(!isset($sorts[$sort])) {
-            return $data;
-        }
-        $tmp[] = $cols;
-        $tmp[] = $sorts[$sort];
-    }
-    $tmp[] = $data;
-    call_user_func_array(&#39;array_multisort&#39;, $tmp);
-    // array_multisort($cols, $sorts[$sort], $data);
-    print_r($data);
-    return $data;
-}
-
-$data = [
-    [&#39;score&#39;=&gt;2, &#39;date&#39;=&gt;&#39;2015&#39;],
-    [&#39;score&#39;=&gt;2, &#39;date&#39;=&gt;&#39;2014&#39;],
-    [&#39;score&#39;=&gt;1, &#39;date&#39;=&gt;&#39;2017&#39;],
-    [&#39;score&#39;=&gt;3, &#39;date&#39;=&gt;&#39;2014&#39;],
-];
-
-$order = [
-    &#39;score&#39; =&gt; &#39;asc&#39;,
-    &#39;date&#39; =&gt; &#39;desc&#39;
-];
-
-
-$order = orderBy($data, $order);
-</code></pre>
-
-
-		</div>
-
-		
-
-	</article>
   
 	<div class="pagination">
 	 <a class="prev" href="all_1.html">&larr; Older</a> 
@@ -677,7 +786,7 @@ $order = orderBy($data, $order);
 	      </li>
 	  
 	      <li class="post">
-	        <a href="%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.html"><strong>设计模式&nbsp;(2)</strong></a>
+	        <a href="%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.html"><strong>设计模式&nbsp;(3)</strong></a>
 	        
 	        
 	        
@@ -705,7 +814,7 @@ $order = orderBy($data, $order);
 	      </li>
 	  
 	      <li class="post">
-	        <a href="%E8%BF%90%E7%BB%B4.html"><strong>运维&nbsp;(1)</strong></a>
+	        <a href="%E8%BF%90%E7%BB%B4.html"><strong>运维&nbsp;(2)</strong></a>
 	        
 	        
 	        
@@ -716,6 +825,18 @@ $order = orderBy($data, $order);
 	<section>
 	  <h1>Recent Posts</h1>
 	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15560194068510.html">resful 最佳实践</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15554074466566.html">git 一些常用的命令</a>
+		      </li>
+	     
 	  
 	      
 		      <li class="post">
@@ -732,18 +853,6 @@ $order = orderBy($data, $order);
 	      
 		      <li class="post">
 		        <a href="15543440484929.html">查看表占用磁盘空间大小</a>
-		      </li>
-	     
-	  
-	      
-		      <li class="post">
-		        <a href="15542835215385.html">查询最近一段时间内不活跃用户最后的上报page页面人数占比</a>
-		      </li>
-	     
-	  
-	      
-		      <li class="post">
-		        <a href="15540894210258.html">php 生成uuid的统一类</a>
 		      </li>
 	     
 	  

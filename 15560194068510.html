@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <title>
     
-  设计模式 - 搁羽念风
+  resful 最佳实践 - 搁羽念风
   
 
   </title>
@@ -78,17 +78,14 @@ $(document).ready(function(event) {
 </nav>
   <div id="main">
     <div id="content"> 
-<div class="blog-index">
-
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15560194068510.html">resful 最佳实践</a></h1>
-			<p class="meta"><time datetime="2019-04-23T19:36:46+08:00" 
-			pubdate data-updated="true">2019/4/23</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<h2 id="toc_0">url设计</h2>
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">resful 最佳实践</h1>
+				<p class="meta"><time datetime="2019-04-23T19:36:46+08:00" pubdate data-updated="true">2019/4/23</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<h2 id="toc_0">url设计</h2>
 
 <ol>
 <li>推荐使用复数名词 <code>/employees/21</code></li>
@@ -275,154 +272,41 @@ $(document).ready(function(event) {
 
 <p>根据 RFC3986 定义，URI 是对大小写敏感的，所以为了避免歧义，我们尽量用小写字符</p>
 
-
-		</div>
-
-		
-
-	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15512397780424.html">cellnet 网络框架,源码解读</a></h1>
-			<p class="meta"><time datetime="2019-02-27T11:56:18+08:00" 
-			pubdate data-updated="true">2019/2/27</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<pre class="line-numbers"><code class="language-text">├── cellnet
-│   ├── codec               // 编码格式
-│   │   └── json            // json格式编码包
-│   │       └── json.go     // json格式适配器
-│   ├── codec.go            // 编码适配器
-│   ├── internal            // 中文意思,内部,此处是内部用函数包的意思
-│   │   ├── log.go          // 记录日志,初始化
-│   │   └── sesmgr.go       // 会话管理功能的包, 包括增加,移除,获取,遍历,统计等功能
-│   ├── log.go              // 记录日志,初始化
-│   ├── meta.go             // 目标消息体
-│   ├── packet              // 封包解包库
-│   │   ├── log.go          // 记录日志,初始化
-│   │   ├── packet.go       // 核心的封包解包器,2个功能,接收变长包,发送变长包
-│   │   ├── pktreader.go    // Packet,Reader 包数据阅读器
-│   │   ├── pktwriter.go    // Packet,Writer 包数据写入器
-│   │   ├── recv.go         // 接收, length-type-value 封包数据
-│   │   ├── send.go         // 发送, length-type-value 封包数据
-│   │   └── setup.go        // 启动封包器,设定回调进程
-│   ├── peer.go             // 会话管理器
-│   ├── queue.go            // 事件循环队列
-│   ├── socket
-│   │   ├── acceptor.go     // 侦听端口,建立session,管理session,监听端口等
-│   │   ├── connector.go    // 连接器, 开始连接,结束连接,获取session
-│   │   ├── event.go        // 定义了各种事件发生时的结构体
-│   │   ├── log.go          // 记录日志,初始化
-│   │   ├── peer.go         // socket端口,名称,队列,派发事件
-│   │   └── session.go      // 原始连接,同步器,通讯端口,消息队列
-│   └── test
-│       └── test_test.go    // 测试
-└── chat
-    ├── client
-    │   └── main.go         // 客户端
-    ├── proto
-    │   └── chat.go         // 消息通讯格式
-    └── server
-        └── main.go         // 服务器
-
-</code></pre>
-
-<h2 id="toc_0">客户端分析</h2>
-
-
-		</div>
+			</div>
 
 		
+	  
+		<footer>
+		 <p class="meta">
 
-	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15490763418639.html">下拉框统一查询接口</a></h1>
-			<p class="meta"><time datetime="2019-02-02T10:59:01+08:00" 
-			pubdate data-updated="true">2019/2/2</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<h2 id="toc_0">描述</h2>
-
-<blockquote>
-<p>在设计数据查询后台时,经常会遇到一些下拉菜单,需要进行筛选,所以常常需要写一些数据查询接口,这样的接口写多了以后,就需要将其统一抽象起来,方便使用<br/>
-所以编写了这样一套统一api接口</p>
-</blockquote>
-
-<h3 id="toc_1">使用方法</h3>
-
-<h4 id="toc_2">请求地址</h4>
-
-<p><code>/api/fields/any</code></p>
-
-<h4 id="toc_3">请求方式</h4>
-
-<p><strong>GET</strong></p>
-
-<h4 id="toc_4">请求参数</h4>
-
-<table>
-<thead>
-<tr>
-<th>字段</th>
-<th>类型</th>
-<th>描述</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td>table</td>
-<td>string</td>
-<td>指定表名称,可以是抽象表</td>
-</tr>
-<tr>
-<td>field</td>
-<td>string</td>
-<td>指定要取出的字段, 可以是抽象字段</td>
-</tr>
-<tr>
-<td>type</td>
-<td>string</td>
-<td>目前只有 kv, v</td>
-</tr>
-<tr>
-<td>profiex</td>
-<td>string</td>
-<td>字段名添加统一前缀</td>
-</tr>
-</tbody>
-</table>
-
-<h2 id="toc_5">配置参数</h2>
-
-<h3 id="toc_6">前置查询</h3>
-
-<h3 id="toc_7">后置查询</h3>
-
-<h3 id="toc_8">虚拟字段</h3>
-
-<h3 id="toc_9">回调函数</h3>
-
-<h3 id="toc_10">返回格式指定</h3>
-
-
-		</div>
-
-		
-
-	</article>
-  
-	<div class="pagination">
-	
-<a href="archives.html">Blog Archives</a>
-	 
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.html'>设计模式</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
 	    
-	</div>
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	    
+	        <a class="basic-alignment right" href="15554074466566.html" 
+	        title="Next Post: git 一些常用的命令">git 一些常用的命令 &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
 </div>
  <aside class="sidebar"> 
 
