@@ -150,12 +150,22 @@ $(document).ready(function(event) {
 
 <blockquote>
 <p>使用 <code>go mod init {项目名称}</code> 来对项目进行初始化<br/>
-<img src="media/15572845291359/15572860090461.jpg" alt=""/></p>
-
-<p><img src="media/15572845291359/15572860373991.jpg" alt=""/></p>
+<img src="media/15572845291359/15572973310331.jpg" alt=""/></p>
 </blockquote>
 
-<h2 id="toc_4">常用技巧</h2>
+<h3 id="toc_4">修改依赖为指定版本</h3>
+
+<blockquote>
+<p>因为 go.uuid 作者在某个版本修改了api导致原有代码无法使用<br/>
+这里使用 go mod edit -replace命令,替换指定的版本<br/>
+修改完成后 go.mod 文件详情<br/>
+也可以用来替换一些 国内被墙掉的一些模块 如 <code>golang.org/*/*</code><br/>
+<img src="media/15572845291359/15573010751405.jpg" alt=""/></p>
+</blockquote>
+
+<h3 id="toc_5">内部模块需要变更为相对路径</h3>
+
+<p><img src="media/15572845291359/15573040729874.jpg" alt=""/></p>
 
 
 		</div>
