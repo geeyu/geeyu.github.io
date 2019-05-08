@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <title>
     
-  php相关函数 - 搁羽念风
+  Go mod 使用教程 - 搁羽念风
   
 
   </title>
@@ -81,49 +81,78 @@ $(document).ready(function(event) {
 <div>
 	<article class="hentry" role="article">
 	<header>
-			  	<h1 class="entry-title">php相关函数</h1>
-				<p class="meta"><time datetime="2019-04-10T15:32:13+08:00" pubdate data-updated="true">2019/4/10</time></p>
+			  	<h1 class="entry-title">Go mod 使用教程</h1>
+				<p class="meta"><time datetime="2019-05-08T11:02:09+08:00" pubdate data-updated="true">2019/5/8</time></p>
 			 </header>
 		  	<div class="entry-content">
-			  	<h3 id="toc_0">umask() 函数,改变umask值,使进程权限保持一致</h3>
+			  	<h2 id="toc_0">介绍&amp;优势</h2>
 
-<pre class="line-numbers"><code class="language-text">编写linux守护进程的时候,需要设置umask 这个值,用户权限屏蔽位, 
-当用户创建目录或者文件的时候,会有一个预设的权限 r=4,w=2,x=1
-目录的预设权限是：0777 drwxrwxrwx
-文件的预设权限为: 0666 -rw-rw-rw-
+<p><code>mod</code> 命令是在 go 1.11版本新增的命令,目的是取代<code>GOPATH</code>,提供go官方的包管理解决方案,使用户可以在非<code>$GOPATH/src</code> 目录下随意的构建项目</p>
 
-用这个权限减去 umask的权限,就是新建的目录或者文件的实际权限了
-umask 默认值为  0022
-新建文件夹权限为  0777 - 0022 = 0755
-新建文件权限为   0666 - 0022 = 0644
-</code></pre>
+<ul>
+<li>使用mod命令后,将会在 项目目录下生成 一个 go.mod 文件,记录了go项目中引用的模块</li>
+<li>mod 功能启用时,使用的模块将存储在 <code>$GOPATH/pkg/mod</code>中,方便其他项目复用</li>
+<li>当然也可以选择使用<code>go mod vendor</code> 命令,项目依赖的模块,保存到项目目录下的 vendor目录中</li>
+</ul>
 
-<h3 id="toc_1">pcntl_fork() 函数,在进程的当前位置产生分支(子进程)</h3>
+<h2 id="toc_1">参数</h2>
 
-<p>在当前进程的当前位置 产生分支(子进程), 都从fork位置继续执行, <br/>
-成功时<br/>
-    父进程执行过程中得到的fork返回值为子进程号,子进程得到的是0<br/>
-失败时<br/>
-    父进程将会返回 -1,不会创建子进程,并引发一个php错误</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
 
-<h3 id="toc_2">posix_setsid() 新建一个session终端,脱离原有终端的控制</h3>
+<tbody>
+<tr>
+<td>download</td>
+<td>下载依赖的模块到本地缓存中</td>
+</tr>
+<tr>
+<td>edit</td>
+<td>编辑go.mod</td>
+</tr>
+<tr>
+<td>graph</td>
+<td>打印模块依赖图</td>
+</tr>
+<tr>
+<td>init</td>
+<td>在当前目录初始化 go.mod文件</td>
+</tr>
+<tr>
+<td>tidy</td>
+<td>下载缺少的模块, 移除不用的模块</td>
+</tr>
+<tr>
+<td>vendor</td>
+<td>将依赖从本地缓存复制一份到 ./vendor 目录中</td>
+</tr>
+<tr>
+<td>verify</td>
+<td>校验依赖是否正确</td>
+</tr>
+<tr>
+<td>why</td>
+<td>解释某个模块为什么被依赖</td>
+</tr>
+</tbody>
+</table>
 
-<p>成功时<br/>
-    返回 session_id<br/>
-失败时<br/>
-    返回 -1</p>
+<h2 id="toc_2">开始使用</h2>
 
-<h3 id="toc_3">php_sapi_name() 判断运行时环境</h3>
+<h3 id="toc_3">初始化</h3>
 
-<h3 id="toc_4">extension_loaded() 检查一个扩展是否已经加载</h3>
+<blockquote>
+<p>使用 <code>go mod init {项目名称}</code> 来对项目进行初始化<br/>
+<img src="media/15572845291359/15572860090461.jpg" alt=""/></p>
 
-<h3 id="toc_5">cli_set_process_title()</h3>
+<p><img src="media/15572845291359/15572860373991.jpg" alt=""/></p>
+</blockquote>
 
-<p>为进程设定title <br/>
-成功时<br/>
-    返回 true<br/>
-失败时<br/>
-    返回 false</p>
+<h2 id="toc_4">常用技巧</h2>
 
 			</div>
 
@@ -135,7 +164,7 @@ umask 默认值为  0022
 			<strong>Categories:</strong>&nbsp; 
 			<span class="categories">
 			
-			    <a class='category' href='php.html'>php</a>&nbsp;
+			    <a class='category' href='golang.html'>golang</a>&nbsp;
 			 
 			</span>
 		    </p>
@@ -153,12 +182,9 @@ umask 默认值为  0022
 
 	    <p class="meta">
 	    
-	        <a class="basic-alignment left" href="15553150635573.html" 
-	        title="Previous Post: 给clickhouse 物化视图增加字段">&laquo; 给clickhouse 物化视图增加字段</a>
 	    
-	    
-	        <a class="basic-alignment right" href="15543440484929.html" 
-	        title="Next Post: 查看表占用磁盘空间大小">查看表占用磁盘空间大小 &raquo;</a>
+	        <a class="basic-alignment right" href="15560743380263.html" 
+	        title="Next Post: 深度思维笔记">深度思维笔记 &raquo;</a>
 	    
 	    </p>
 	  </footer>

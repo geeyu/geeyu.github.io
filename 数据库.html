@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <title>
     
-  redis - 搁羽念风
+  数据库 - 搁羽念风
   
 
   </title>
@@ -80,6 +80,100 @@ $(document).ready(function(event) {
     <div id="content"> 
 <div class="blog-index">
 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15553150635573.html">给clickhouse 物化视图增加字段</a></h1>
+			<p class="meta"><time datetime="2019-04-15T15:57:43+08:00" 
+			pubdate data-updated="true">2019/4/15</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<pre class="line-numbers"><code class="language-sql">-- 先查找一下sql路径
+SELECT metadata_path FROM system.tables WHERE name = &#39;demo&#39;;
+
+-- 摘除掉视图
+DETACH table mid.play_block_status
+
+-- 为 .inner.demo 表增加字段
+alter table mid.`.inner.demo` add column ip String;
+alter table mid.`.inner.demo` add column operator String;
+
+-- 为 物化视图增加字段
+根据第一步 查到的 metadata_path 路径, 为视图修改表结构
+
+-- 重新加载视图
+ATTACH table mid.play_block_status
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15543440484929.html">查看表占用磁盘空间大小</a></h1>
+			<p class="meta"><time datetime="2019-04-04T10:14:08+08:00" 
+			pubdate data-updated="true">2019/4/4</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<pre class="line-numbers"><code class="language-sql">SELECT table, formatReadableSize(size) as size, rows, days, formatReadableSize(avgDaySize) as avgDaySize FROM (
+    SELECT
+        table,
+        sum(bytes) AS size,
+        sum(rows) AS rows,
+        min(min_date) AS min_date,
+        max(max_date) AS max_date,
+        (max_date - min_date) AS days,
+        size / (max_date - min_date) AS avgDaySize
+    FROM system.parts
+    WHERE active
+    GROUP BY table
+    ORDER BY rows DESC
+)
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15511647865786.html">clickhouse 奇技淫巧</a></h1>
+			<p class="meta"><time datetime="2019-02-26T15:06:26+08:00" 
+			pubdate data-updated="true">2019/2/26</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">函数</h2>
+
+<blockquote>
+<p><code>positionCaseInsensitive</code> 不区分大小写,查找字符串的所在位置, 未找到则为0<br/>
+<code>positionCaseInsensitiveUTF8</code> 同上,不过汉字也算作一个字符<br/>
+<code>cityHash64</code> 快速哈希,规则相同<br/>
+<code>groupArray</code> 根据group 将一个或者多个字段合并成数组<br/>
+<code>intDiv</code> 整除,intDiv(时间戳, 3600)*3600 即可按照每小时分组</p>
+</blockquote>
+
+<h2 id="toc_1">常用</h2>
+
+<blockquote>
+<p><code>optimize table 表名</code> 如果是一个 聚合类型表,那么可以将主动触发一次聚合</p>
+</blockquote>
+
+
+		</div>
+
+		
+
+	</article>
+ 
 	<article>
 		 <header>
 		  	<h1 class="entry-title"><a href="15482336668160.html">应用 2：缓兵之计 —— 延时队列</a></h1>

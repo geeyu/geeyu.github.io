@@ -82,6 +82,245 @@ $(document).ready(function(event) {
 
 	<article>
 		 <header>
+		  	<h1 class="entry-title"><a href="15482336668160.html">应用 2：缓兵之计 —— 延时队列</a></h1>
+			<p class="meta"><time datetime="2019-01-23T16:54:26+08:00" 
+			pubdate data-updated="true">2019/1/23</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>我们平时习惯于使用 Rabbitmq 和 Kafka 作为消息队列中间件，来给应用程序之间增加异步消息传递功能。这两个中间件都是专业的消息队列中间件，特性之多超出了大多数人的理解能力。</p>
+
+<p>使用过 Rabbitmq 的同学知道它使用起来有多复杂，发消息之前要创建 Exchange，再创建 Queue，还要将 Queue 和 Exchange 通过某种规则绑定起来，发消息的时候要指定 routing-key，还要控制头部信息。消费者在消费消息之前也要进行上面一系列的繁琐过程。但是绝大多数情况下，虽然我们的消息队列只有一组消费者，但还是需要经历上面这些繁琐的过程。</p>
+
+<p>有了 Redis，它就可以让我们解脱出来，对于那些只有一组消费者的消息队列，使用 Redis 就可以非常轻松的搞定。Redis 的消息队列不是专业的消息队列，它没有非常多的高级特性，没有 ack 保证，如果对消息的可靠性有着极致的追求，那么它就不适合使用。</p>
+
+<h2 id="toc_0">异步消息队列</h2>
+
+<p>Redis 的 list(列表) 数据结构常用来作为异步消息队列使用，使用<code>rpush/lpush</code>操作入队列，使用<code>lpop 和 rpop</code>来出队列。</p>
+
+<p><img src="https://user-gold-cdn.xitu.io/2018/7/10/1648229e1dbfd776?w=862&amp;h=179&amp;f=png&amp;s=17012" alt=""/></p>
+
+<pre class="line-numbers"><code class="language-text">&gt; rpush notify-queue apple banana pear
+(integer) 3
+&gt; llen notify-queue
+(integer) 3
+&gt; lpop notify-queue
+&quot;apple&quot;
+&gt; llen notify-queue
+(integer) 2
+&gt; lpop notify-queue
+&quot;banana&quot;
+&gt; llen notify-queue
+(integer) 1
+&gt; lpop notify-queue
+&quot;pear&quot;
+&gt; llen notify-queue
+(integer) 0
+&gt; lpop notify-queue
+(nil)
+</code></pre>
+
+<p>上面是 rpush 和 lpop 结合使用的例子。还可以使用 lpush 和 rpop 结合使用，效果是一样的。这里不再赘述。</p>
+
+<h2 id="toc_1">队列空了怎么办？</h2>
+
+<p>客户端是通过队列的 pop 操作来获取消息，然后进行处理。处理完了再接着获取消息，再进行处理。如此循环往复，这便是作为队列消费者的客户端的生命周期。</p>
+
+<p>可是如果队列空了，客户端就会陷入 pop 的死循环，不停地 pop，没有数据，接着再 pop，又没有数据。这就是浪费生命的空轮询。空轮询不但拉高了客户端的 CPU，redis 的 QPS 也会被拉高，如果这样空轮询的客户端有几十来个，Redis 的慢查询可能会显著增多。</p>
+
+<p>通常我们使用 sleep 来解决这个问题，让线程睡一会，睡个 1s 钟就可以了。不但客户端的 CPU 能降下来，Redis 的 QPS 也降下来了。</p>
+
+<pre class="line-numbers"><code class="language-text">time.sleep(1) # python 睡 1s
+Thread.sleep(1000) # java 睡 1s
+</code></pre>
+
+<p><img src="https://user-gold-cdn.xitu.io/2018/7/10/164822ccec7ccb85?w=808&amp;h=266&amp;f=png&amp;s=31608" alt=""/></p>
+
+<h2 id="toc_2">队列延迟</h2>
+
+<p>用上面睡眠的办法可以解决问题。但是有个小问题，那就是睡眠会导致消息的延迟增大。如果只有 1 个消费者，那么这个延迟就是 1s。如果有多个消费者，这个延迟会有所下降，因为每个消费者的睡觉时间是岔开来的。</p>
+
+<p>有没有什么办法能显著降低延迟呢？你当然可以很快想到：那就把睡觉的时间缩短点。这种方式当然可以，不过有没有更好的解决方案呢？当然也有，那就是 blpop/brpop。</p>
+
+<p>这两个指令的前缀字符<code>b</code>代表的是<code>blocking</code>，也就是阻塞读。</p>
+
+<p>阻塞读在队列没有数据的时候，会立即进入休眠状态，一旦数据到来，则立刻醒过来。消息的延迟几乎为零。用<code>blpop/brpop</code>替代前面的<code>lpop/rpop</code>，就完美解决了上面的问题。</p>
+
+<h2 id="toc_3">空闲连接自动断开</h2>
+
+<p>你以为上面的方案真的很完美么？先别急着开心，其实他还有个问题需要解决。</p>
+
+<p>什么问题？—— <strong>空闲连接</strong>的问题。</p>
+
+<p>如果线程一直阻塞在哪里，Redis 的客户端连接就成了闲置连接，闲置过久，服务器一般会主动断开连接，减少闲置资源占用。这个时候<code>blpop/brpop</code>会抛出异常来。</p>
+
+<p>所以编写客户端消费者的时候要小心，注意捕获异常，还要重试。</p>
+
+<h2 id="toc_4">锁冲突处理</h2>
+
+<p>上节课我们讲了分布式锁的问题，但是没有提到客户端在处理请求时加锁没加成功怎么办。一般有 3 种策略来处理加锁失败：</p>
+
+<ol>
+<li>直接抛出异常，通知用户稍后重试；</li>
+<li>sleep 一会再重试；</li>
+<li>将请求转移至延时队列，过一会再试；</li>
+</ol>
+
+<p><strong>直接抛出特定类型的异常</strong></p>
+
+<p>这种方式比较适合由用户直接发起的请求，用户看到错误对话框后，会先阅读对话框的内容，再点击重试，这样就可以起到人工延时的效果。如果考虑到用户体验，可以由前端的代码替代用户自己来进行延时重试控制。它本质上是对当前请求的放弃，由用户决定是否重新发起新的请求。</p>
+
+<p><strong>sleep</strong></p>
+
+<p>sleep 会阻塞当前的消息处理线程，会导致队列的后续消息处理出现延迟。如果碰撞的比较频繁或者队列里消息比较多，sleep 可能并不合适。如果因为个别死锁的 key 导致加锁不成功，线程会彻底堵死，导致后续消息永远得不到及时处理。</p>
+
+<p><strong>延时队列</strong></p>
+
+<p>这种方式比较适合异步消息处理，将当前冲突的请求扔到另一个队列延后处理以避开冲突。</p>
+
+<h2 id="toc_5">延时队列的实现</h2>
+
+<p>延时队列可以通过 Redis 的 zset(有序列表) 来实现。我们将消息序列化成一个字符串作为 zset 的<code>value</code>，这个消息的到期处理时间作为<code>score</code>，然后用多个线程轮询 zset 获取到期的任务进行处理，多个线程是为了保障可用性，万一挂了一个线程还有其它线程可以继续处理。因为有多个线程，所以需要考虑并发争抢任务，确保任务不能被多次执行。</p>
+
+<pre class="line-numbers"><code class="language-python">def delay(msg):
+ msg.id = str(uuid.uuid4()) # 保证 value 值唯一
+ value = json.dumps(msg)
+ retry_ts = time.time() + 5 # 5 秒后重试
+ redis.zadd(&quot;delay-queue&quot;, retry_ts, value)
+
+
+def loop():
+ while True:
+ # 最多取 1 条
+ values = redis.zrangebyscore(&quot;delay-queue&quot;, 0, time.time(), start=0, num=1)
+ if not values:
+ time.sleep(1) # 延时队列空的，休息 1s
+ continue
+ value = values[0] # 拿第一条，也只有一条
+ success = redis.zrem(&quot;delay-queue&quot;, value) # 从消息队列中移除该消息
+ if success: # 因为有多进程并发的可能，最终只会有一个进程可以抢到消息
+ msg = json.loads(value)
+ handle_msg(msg)
+</code></pre>
+
+<p>Redis 的 zrem 方法是多线程多进程争抢任务的关键，它的返回值决定了当前实例有没有抢到任务，因为 loop 方法可能会被多个线程、多个进程调用，同一个任务可能会被多个进程线程抢到，通过 zrem 来决定唯一的属主。</p>
+
+<p>同时，我们要注意一定要对 handle_msg 进行异常捕获，避免因为个别任务处理问题导致循环异常退出。以下是 Java 版本的延时队列实现，因为要使用到 Json 序列化，所以还需要 fastjson 库的支持。</p>
+
+<pre class="line-numbers"><code class="language-java">import java.lang.reflect.Type;
+import java.util.Set;
+import java.util.UUID;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
+
+import redis.clients.jedis.Jedis;
+
+public class RedisDelayingQueue&lt;T&gt; {
+    
+     static class TaskItem&lt;T&gt; {
+     public String id;
+     public T msg;
+     }
+    
+     // fastjson 序列化对象中存在 generic 类型时，需要使用 TypeReference
+     private Type TaskType = new TypeReference&lt;TaskItem&lt;T&gt;&gt;() {
+     }.getType();
+    
+     private Jedis jedis;
+     private String queueKey;
+    
+     public RedisDelayingQueue(Jedis jedis, String queueKey) {
+     this.jedis = jedis;
+     this.queueKey = queueKey;
+     }
+    
+     public void delay(T msg) {
+     TaskItem&lt;T&gt; task = new TaskItem&lt;T&gt;();
+     task.id = UUID.randomUUID().toString(); // 分配唯一的 uuid
+     task.msg = msg;
+     String s = JSON.toJSONString(task); // fastjson 序列化
+     jedis.zadd(queueKey, System.currentTimeMillis() + 5000, s); // 塞入延时队列 ,5s 后再试
+     }
+    
+     public void loop() {
+     while (!Thread.interrupted()) {
+     // 只取一条
+     Set&lt;String&gt; values = jedis.zrangeByScore(queueKey, 0, System.currentTimeMillis(), 0, 1);
+     if (values.isEmpty()) {
+     try {
+     Thread.sleep(500); // 歇会继续
+     } catch (InterruptedException e) {
+     break;
+     }
+     continue;
+     }
+     String s = values.iterator().next();
+     if (jedis.zrem(queueKey, s) &gt; 0) { // 抢到了
+     TaskItem&lt;T&gt; task = JSON.parseObject(s, TaskType); // fastjson 反序列化
+     this.handleMsg(task.msg);
+     }
+     }
+     }
+    
+     public void handleMsg(T msg) {
+     System.out.println(msg);
+     }
+    
+     public static void main(String[] args) {
+     Jedis jedis = new Jedis();
+     RedisDelayingQueue&lt;String&gt; queue = new RedisDelayingQueue&lt;&gt;(jedis, &quot;q-demo&quot;);
+     Thread producer = new Thread() {
+         public void run() {
+         for (int i = 0; i &lt; 10; i++) {
+         queue.delay(&quot;codehole&quot; + i);
+     }
+     }
+        
+     };
+     Thread consumer = new Thread() {
+    
+     public void run() {
+     queue.loop();
+ }
+    
+ };
+     producer.start();
+     consumer.start();
+     try {
+     producer.join();
+     Thread.sleep(6000);
+     consumer.interrupt();
+     consumer.join();
+ } catch (InterruptedException e) {
+    
+ }
+ }
+}
+</code></pre>
+
+<h2 id="toc_6">进一步优化</h2>
+
+<p>上面的算法中同一个任务可能会被多个进程取到之后再使用 zrem 进行争抢，那些没抢到的进程都是白取了一次任务，这是浪费。可以考虑使用 lua scripting 来优化一下这个逻辑，将 zrangebyscore 和 zrem 一同挪到服务器端进行原子化操作，这样多个进程之间争抢任务时就不会出现这种浪费了。</p>
+
+<h2 id="toc_7">思考</h2>
+
+<hr/>
+
+<ol>
+<li>Redis 作为消息队列为什么不能保证 100% 的可靠性？</li>
+<li>使用 Lua Scripting 来优化延时队列的逻辑。</li>
+</ol>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
 		  	<h1 class="entry-title"><a href="15481408753253.html">redis 常用配置</a></h1>
 			<p class="meta"><time datetime="2019-01-22T15:07:55+08:00" 
 			pubdate data-updated="true">2019/1/22</time></p>
@@ -285,21 +524,45 @@ func main() {
 	  <ul id="recent_posts">
 	  
 	      <li class="post">
-	        <a href="go.html"><strong>go&nbsp;(3)</strong></a>
+	        <a href="linux.html"><strong>linux&nbsp;(3)</strong></a>
 	        
 	        
 	        
 	      </li>
 	  
 	      <li class="post">
-	        <a href="redis.html"><strong>redis&nbsp;(3)</strong></a>
+	        <a href="%E6%95%B0%E6%8D%AE%E5%BA%93.html"><strong>数据库&nbsp;(6)</strong></a>
+	         <p class="cat-children-p"> 
 	        
+	        	<a href="redis.html">redis&nbsp;(3)</a>&nbsp;&nbsp;
 	        
+	        	<a href="clickhouse.html">clickhouse&nbsp;(3)</a>&nbsp;&nbsp;
 	        
+	         </p> 
 	      </li>
 	  
 	      <li class="post">
-	        <a href="%E5%B7%A5%E5%85%B7.html"><strong>工具&nbsp;(2)</strong></a>
+	        <a href="%E4%B8%AD%E9%97%B4%E4%BB%B6.html"><strong>中间件&nbsp;(1)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="%E7%9B%91%E6%8E%A7%E6%8A%A5%E8%AD%A6.html">监控报警&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%AF%AD%E8%A8%80.html"><strong>语言&nbsp;(8)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="php.html">php&nbsp;(4)</a>&nbsp;&nbsp;
+	        
+	        	<a href="golang.html">golang&nbsp;(4)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%B7%A5%E5%85%B7.html"><strong>工具&nbsp;(1)</strong></a>
 	        
 	        
 	        
@@ -313,28 +576,7 @@ func main() {
 	      </li>
 	  
 	      <li class="post">
-	        <a href="clickhouse.html"><strong>clickhouse&nbsp;(4)</strong></a>
-	        
-	        
-	        
-	      </li>
-	  
-	      <li class="post">
-	        <a href="php.html"><strong>php&nbsp;(4)</strong></a>
-	        
-	        
-	        
-	      </li>
-	  
-	      <li class="post">
-	        <a href="%E6%9E%B6%E6%9E%84.html"><strong>架构&nbsp;(1)</strong></a>
-	        
-	        
-	        
-	      </li>
-	  
-	      <li class="post">
-	        <a href="%E8%BF%90%E7%BB%B4.html"><strong>运维&nbsp;(2)</strong></a>
+	        <a href="%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0.html"><strong>读书笔记&nbsp;(1)</strong></a>
 	        
 	        
 	        
@@ -345,6 +587,18 @@ func main() {
 	<section>
 	  <h1>Recent Posts</h1>
 	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15572845291359.html">Go mod 使用教程</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15560743380263.html">深度思维笔记</a>
+		      </li>
+	     
 	  
 	      
 		      <li class="post">
@@ -361,18 +615,6 @@ func main() {
 	      
 		      <li class="post">
 		        <a href="15553150635573.html">给clickhouse 物化视图增加字段</a>
-		      </li>
-	     
-	  
-	      
-		      <li class="post">
-		        <a href="15548815336055.html">php相关函数</a>
-		      </li>
-	     
-	  
-	      
-		      <li class="post">
-		        <a href="15543440484929.html">查看表占用磁盘空间大小</a>
 		      </li>
 	     
 	  

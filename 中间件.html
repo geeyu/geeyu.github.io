@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <title>
     
-  php相关函数 - 搁羽念风
+  中间件 - 搁羽念风
   
 
   </title>
@@ -78,91 +78,219 @@ $(document).ready(function(event) {
 </nav>
   <div id="main">
     <div id="content"> 
-<div>
-	<article class="hentry" role="article">
-	<header>
-			  	<h1 class="entry-title">php相关函数</h1>
-				<p class="meta"><time datetime="2019-04-10T15:32:13+08:00" pubdate data-updated="true">2019/4/10</time></p>
-			 </header>
-		  	<div class="entry-content">
-			  	<h3 id="toc_0">umask() 函数,改变umask值,使进程权限保持一致</h3>
+<div class="blog-index">
 
-<pre class="line-numbers"><code class="language-text">编写linux守护进程的时候,需要设置umask 这个值,用户权限屏蔽位, 
-当用户创建目录或者文件的时候,会有一个预设的权限 r=4,w=2,x=1
-目录的预设权限是：0777 drwxrwxrwx
-文件的预设权限为: 0666 -rw-rw-rw-
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15510618792149.html">prometheus 安装部署</a></h1>
+			<p class="meta"><time datetime="2019-02-25T10:31:19+08:00" 
+			pubdate data-updated="true">2019/2/25</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">介绍</h2>
 
-用这个权限减去 umask的权限,就是新建的目录或者文件的实际权限了
-umask 默认值为  0022
-新建文件夹权限为  0777 - 0022 = 0755
-新建文件权限为   0666 - 0022 = 0644
+<p>Prometheus是一套开源的监控&amp;报警&amp;时间序列数据库的组合,起始是由SoundCloud公司开发的。成立于2012年，之后许多公司和组织接受和采用prometheus,他们便将它独立成开源项目，并且有公司来运作.该项目有非常活跃的社区和开发人员，目前是独立的开源项目，任何公司都可以使用它，2016年，Prometheus加入了云计算基金会，成为kubernetes之后的第二个托管项目.google SRE的书内也曾提到跟他们BorgMon监控系统相似的实现是Prometheus。现在最常见的Kubernetes容器管理系统中，通常会搭配Prometheus进行监控。</p>
+
+<h2 id="toc_1">数据类型</h2>
+
+<h3 id="toc_2">Counter</h3>
+
+<ul>
+<li>用于累计值,请求次数,完成数等</li>
+<li>一直增加,不会减少</li>
+<li>重启后,会被重置</li>
+</ul>
+
+<h3 id="toc_3">Gauge</h3>
+
+<ul>
+<li>Gauge 常规数值, 温度变化,CPU,内存,网络变化</li>
+<li>可变大,可变小</li>
+<li>重启进程后,重置</li>
+</ul>
+
+<h3 id="toc_4">Histogram</h3>
+
+<ul>
+<li>直方图,跟踪时间发生,请求持续时间或响应时间的规模</li>
+<li>可对记录内容分组,提供 count和 sum 全部值的功能</li>
+</ul>
+
+<h3 id="toc_5">Summary</h3>
+
+<p>在prometheus中,任何可被采集的目标都被称为instance,相同类型的instance的集合被称为job</p>
+
+<pre class="line-numbers"><code class="language-text">- job: api-server
+    - instance1: 1.2.3.4:5670
+    - instance2: 1.2.3.4:5671
+    - instance3: 5.6.7.8:5670
+    - instance3: 5.6.7.8:5671
 </code></pre>
 
-<h3 id="toc_1">pcntl_fork() 函数,在进程的当前位置产生分支(子进程)</h3>
+<h2 id="toc_6">下载</h2>
 
-<p>在当前进程的当前位置 产生分支(子进程), 都从fork位置继续执行, <br/>
-成功时<br/>
-    父进程执行过程中得到的fork返回值为子进程号,子进程得到的是0<br/>
-失败时<br/>
-    父进程将会返回 -1,不会创建子进程,并引发一个php错误</p>
+<pre class="line-numbers"><code class="language-text">wget https://github.com/prometheus/prometheus/releases/download/v2.7.1/prometheus-2.7.1.linux-amd64.tar.gz
+</code></pre>
 
-<h3 id="toc_2">posix_setsid() 新建一个session终端,脱离原有终端的控制</h3>
+<h2 id="toc_7">安装</h2>
 
-<p>成功时<br/>
-    返回 session_id<br/>
-失败时<br/>
-    返回 -1</p>
+<ul>
+<li>解压</li>
+</ul>
 
-<h3 id="toc_3">php_sapi_name() 判断运行时环境</h3>
+<pre class="line-numbers"><code class="language-text">tar -zxvf prometheus-2.7.1.linux-amd64.tar.gz 
+</code></pre>
 
-<h3 id="toc_4">extension_loaded() 检查一个扩展是否已经加载</h3>
+<ul>
+<li>创建目录</li>
+</ul>
 
-<h3 id="toc_5">cli_set_process_title()</h3>
+<pre class="line-numbers"><code class="language-text">mv ./prometheus-2.7.1.linux-amd64 /usr/local/prometheus
+</code></pre>
 
-<p>为进程设定title <br/>
-成功时<br/>
-    返回 true<br/>
-失败时<br/>
-    返回 false</p>
+<ul>
+<li>创建用户和用户组</li>
+</ul>
 
-			</div>
+<pre class="line-numbers"><code class="language-text">groupadd prometheus
+useradd -g prometheus -s /sbin/nologin prometheus
+</code></pre>
 
-		
-	  
-		<footer>
-		 <p class="meta">
+<h2 id="toc_8">配置开机启动&amp;守护进程</h2>
 
-			<strong>Categories:</strong>&nbsp; 
-			<span class="categories">
-			
-			    <a class='category' href='php.html'>php</a>&nbsp;
-			 
-			</span>
-		    </p>
-		    <p class="meta">
-		      
-		 </p>
-	    
-		<div class="sharing">
-		  
-          
+<ul>
+<li>创建文件</li>
+</ul>
 
-          
+<pre class="line-numbers"><code class="language-text"> vim /usr/lib/systemd/system/prometheus.service
+</code></pre>
+
+<ul>
+<li>添加内容</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text"> [Unit]
+Description=Prometheus
+Documentation=https://prometheus.io/
+After=network.target
+
+[Service]
+# Type设置为notify时，服务会不断重启
+Type=simple
+User=prometheus
+# --storage.tsdb.path是可选项，默认数据目录在运行目录的./dada目录中
+ExecStart=/usr/local/prometheus/prometheus --config.file=/usr/local/prometheus/prometheus.yml --storage.tsdb.path=/var/lib/prometheus
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+
+<ul>
+<li>修改权限</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">chown prometheus:prometheus /usr/lib/systemd/system/prometheus.service
+</code></pre>
+
+<ul>
+<li>开启守护进程</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">systemctl enable prometheus
+</code></pre>
+
+<ul>
+<li>启动进程</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">systemctl start prometheus
+</code></pre>
+
+<h2 id="toc_9">使用</h2>
+
+<h3 id="toc_10">编译</h3>
+
+<ul>
+<li>下载</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">go get -u -v github.com/f1yegor/clickhouse_exporter
+</code></pre>
+
+<ul>
+<li>mac 下编译linux 系统软件</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">cd $GOPATH/github.com/f1yegor/clickhouse_exporter
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
+</code></pre>
+
+<h3 id="toc_11">启动</h3>
+
+<ul>
+<li>每台子节点机器都要添加这个任务</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">vim clickhouse_exporter.sh
+</code></pre>
+
+<ul>
+<li>添加内容</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">#!/usr/bin/env bash
+/usr/local/clickhouse_exporter/clickhouse_exporter -log.level=debug -scrape_uri=http://127.0.0.1:8123
+</code></pre>
+
+<ul>
+<li>启动脚本</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">chmod +x ./clickhouse_exporter.sh
+nohup clickhouse_exporter.sh &amp;
+</code></pre>
+
+<ul>
+<li>添加定时任务</li>
+</ul>
+
+<blockquote>
+<p>重新打开 prometheus ,修改配置文件<code>prometheus.yml</code>,增加配置<br/>
+此时,数据将会被prometheus所记录</p>
+</blockquote>
+
+<pre class="line-numbers"><code class="language-text">  - job_name: &#39;clickhouse&#39;
+    static_configs:
+    - targets: [&#39;10.0.0.1:9116&#39;]
+      labels:
+        instance: node-01
+    - targets: [&#39;10.0.0.2:9116&#39;]
+      labels:
+        instance: node-02
+    - targets: [&#39;10.0.0.3:9116&#39;]
+      labels:
+        instance: node-03
+</code></pre>
+
+<h2 id="toc_12">优化</h2>
+
+<h2 id="toc_13">总结</h2>
+
 
 		</div>
 
-	    <p class="meta">
-	    
-	        <a class="basic-alignment left" href="15553150635573.html" 
-	        title="Previous Post: 给clickhouse 物化视图增加字段">&laquo; 给clickhouse 物化视图增加字段</a>
-	    
-	    
-	        <a class="basic-alignment right" href="15543440484929.html" 
-	        title="Next Post: 查看表占用磁盘空间大小">查看表占用磁盘空间大小 &raquo;</a>
-	    
-	    </p>
-	  </footer>
+		
+
 	</article>
+  
+	<div class="pagination">
+	
+<a href="archives.html">Blog Archives</a>
+	 
+	    
+	</div>
 </div>
  <aside class="sidebar"> 
 

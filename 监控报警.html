@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <title>
     
-  php 生成uuid的统一类 - 搁羽念风
+  监控报警 - 搁羽念风
   
 
   </title>
@@ -78,172 +78,219 @@ $(document).ready(function(event) {
 </nav>
   <div id="main">
     <div id="content"> 
-<div>
-	<article class="hentry" role="article">
-	<header>
-			  	<h1 class="entry-title">php 生成uuid的统一类</h1>
-				<p class="meta"><time datetime="2019-04-01T11:30:21+08:00" pubdate data-updated="true">2019/4/1</time></p>
-			 </header>
-		  	<div class="entry-content">
-			  	<pre class="line-numbers"><code class="language-php">&lt;?php
-class UUID {
-  public static function v3($namespace, $name) {
-    if(!self::is_valid($namespace)) return false;
+<div class="blog-index">
 
-    // Get hexadecimal components of namespace
-    $nhex = str_replace(array(&#39;-&#39;,&#39;{&#39;,&#39;}&#39;), &#39;&#39;, $namespace);
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15510618792149.html">prometheus 安装部署</a></h1>
+			<p class="meta"><time datetime="2019-02-25T10:31:19+08:00" 
+			pubdate data-updated="true">2019/2/25</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">介绍</h2>
 
-    // Binary Value
-    $nstr = &#39;&#39;;
+<p>Prometheus是一套开源的监控&amp;报警&amp;时间序列数据库的组合,起始是由SoundCloud公司开发的。成立于2012年，之后许多公司和组织接受和采用prometheus,他们便将它独立成开源项目，并且有公司来运作.该项目有非常活跃的社区和开发人员，目前是独立的开源项目，任何公司都可以使用它，2016年，Prometheus加入了云计算基金会，成为kubernetes之后的第二个托管项目.google SRE的书内也曾提到跟他们BorgMon监控系统相似的实现是Prometheus。现在最常见的Kubernetes容器管理系统中，通常会搭配Prometheus进行监控。</p>
 
-    // Convert Namespace UUID to bits
-    for($i = 0; $i &lt; strlen($nhex); $i+=2) {
-      $nstr .= chr(hexdec($nhex[$i].$nhex[$i+1]));
-    }
+<h2 id="toc_1">数据类型</h2>
 
-    // Calculate hash value
-    $hash = md5($nstr . $name);
+<h3 id="toc_2">Counter</h3>
 
-    return sprintf(&#39;%08s-%04s-%04x-%04x-%12s&#39;,
+<ul>
+<li>用于累计值,请求次数,完成数等</li>
+<li>一直增加,不会减少</li>
+<li>重启后,会被重置</li>
+</ul>
 
-      // 32 bits for &quot;time_low&quot;
-      substr($hash, 0, 8),
+<h3 id="toc_3">Gauge</h3>
 
-      // 16 bits for &quot;time_mid&quot;
-      substr($hash, 8, 4),
+<ul>
+<li>Gauge 常规数值, 温度变化,CPU,内存,网络变化</li>
+<li>可变大,可变小</li>
+<li>重启进程后,重置</li>
+</ul>
 
-      // 16 bits for &quot;time_hi_and_version&quot;,
-      // four most significant bits holds version number 3
-      (hexdec(substr($hash, 12, 4)) &amp; 0x0fff) | 0x3000,
+<h3 id="toc_4">Histogram</h3>
 
-      // 16 bits, 8 bits for &quot;clk_seq_hi_res&quot;,
-      // 8 bits for &quot;clk_seq_low&quot;,
-      // two most significant bits holds zero and one for variant DCE1.1
-      (hexdec(substr($hash, 16, 4)) &amp; 0x3fff) | 0x8000,
+<ul>
+<li>直方图,跟踪时间发生,请求持续时间或响应时间的规模</li>
+<li>可对记录内容分组,提供 count和 sum 全部值的功能</li>
+</ul>
 
-      // 48 bits for &quot;node&quot;
-      substr($hash, 20, 12)
-    );
-  }
+<h3 id="toc_5">Summary</h3>
 
-  public static function v4() {
-    return sprintf(&#39;%04x%04x-%04x-%04x-%04x-%04x%04x%04x&#39;,
+<p>在prometheus中,任何可被采集的目标都被称为instance,相同类型的instance的集合被称为job</p>
 
-      // 32 bits for &quot;time_low&quot;
-      mt_rand(0, 0xffff), mt_rand(0, 0xffff),
-
-      // 16 bits for &quot;time_mid&quot;
-      mt_rand(0, 0xffff),
-
-      // 16 bits for &quot;time_hi_and_version&quot;,
-      // four most significant bits holds version number 4
-      mt_rand(0, 0x0fff) | 0x4000,
-
-      // 16 bits, 8 bits for &quot;clk_seq_hi_res&quot;,
-      // 8 bits for &quot;clk_seq_low&quot;,
-      // two most significant bits holds zero and one for variant DCE1.1
-      mt_rand(0, 0x3fff) | 0x8000,
-
-      // 48 bits for &quot;node&quot;
-      mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
-    );
-  }
-
-  public static function v5($namespace, $name) {
-    if(!self::is_valid($namespace)) return false;
-
-    // Get hexadecimal components of namespace
-    $nhex = str_replace(array(&#39;-&#39;,&#39;{&#39;,&#39;}&#39;), &#39;&#39;, $namespace);
-
-    // Binary Value
-    $nstr = &#39;&#39;;
-
-    // Convert Namespace UUID to bits
-    for($i = 0; $i &lt; strlen($nhex); $i+=2) {
-      $nstr .= chr(hexdec($nhex[$i].$nhex[$i+1]));
-    }
-
-    // Calculate hash value
-    $hash = sha1($nstr . $name);
-
-    return sprintf(&#39;%08s-%04s-%04x-%04x-%12s&#39;,
-
-      // 32 bits for &quot;time_low&quot;
-      substr($hash, 0, 8),
-
-      // 16 bits for &quot;time_mid&quot;
-      substr($hash, 8, 4),
-
-      // 16 bits for &quot;time_hi_and_version&quot;,
-      // four most significant bits holds version number 5
-      (hexdec(substr($hash, 12, 4)) &amp; 0x0fff) | 0x5000,
-
-      // 16 bits, 8 bits for &quot;clk_seq_hi_res&quot;,
-      // 8 bits for &quot;clk_seq_low&quot;,
-      // two most significant bits holds zero and one for variant DCE1.1
-      (hexdec(substr($hash, 16, 4)) &amp; 0x3fff) | 0x8000,
-
-      // 48 bits for &quot;node&quot;
-      substr($hash, 20, 12)
-    );
-  }
-
-  public static function is_valid($uuid) {
-    return preg_match(&#39;/^\{?[0-9a-f]{8}\-?[0-9a-f]{4}\-?[0-9a-f]{4}\-?&#39;.
-                      &#39;[0-9a-f]{4}\-?[0-9a-f]{12}\}?$/i&#39;, $uuid) === 1;
-  }
-}
-
-// Usage
-// Named-based UUID.
-
-$v3uuid = UUID::v3(&#39;1546058f-5a25-4334-85ae-e68f2a44bbaf&#39;, &#39;SomeRandomString&#39;);
-$v5uuid = UUID::v5(&#39;1546058f-5a25-4334-85ae-e68f2a44bbaf&#39;, &#39;SomeRandomString&#39;);
-
-// Pseudo-random UUID
-
-$v4uuid = UUID::v4();
-?&gt;
+<pre class="line-numbers"><code class="language-text">- job: api-server
+    - instance1: 1.2.3.4:5670
+    - instance2: 1.2.3.4:5671
+    - instance3: 5.6.7.8:5670
+    - instance3: 5.6.7.8:5671
 </code></pre>
 
-			</div>
+<h2 id="toc_6">下载</h2>
 
-		
-	  
-		<footer>
-		 <p class="meta">
+<pre class="line-numbers"><code class="language-text">wget https://github.com/prometheus/prometheus/releases/download/v2.7.1/prometheus-2.7.1.linux-amd64.tar.gz
+</code></pre>
 
-			<strong>Categories:</strong>&nbsp; 
-			<span class="categories">
-			
-			    <a class='category' href='php.html'>php</a>&nbsp;
-			 
-			</span>
-		    </p>
-		    <p class="meta">
-		      
-		 </p>
-	    
-		<div class="sharing">
-		  
-          
+<h2 id="toc_7">安装</h2>
 
-          
+<ul>
+<li>解压</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">tar -zxvf prometheus-2.7.1.linux-amd64.tar.gz 
+</code></pre>
+
+<ul>
+<li>创建目录</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">mv ./prometheus-2.7.1.linux-amd64 /usr/local/prometheus
+</code></pre>
+
+<ul>
+<li>创建用户和用户组</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">groupadd prometheus
+useradd -g prometheus -s /sbin/nologin prometheus
+</code></pre>
+
+<h2 id="toc_8">配置开机启动&amp;守护进程</h2>
+
+<ul>
+<li>创建文件</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text"> vim /usr/lib/systemd/system/prometheus.service
+</code></pre>
+
+<ul>
+<li>添加内容</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text"> [Unit]
+Description=Prometheus
+Documentation=https://prometheus.io/
+After=network.target
+
+[Service]
+# Type设置为notify时，服务会不断重启
+Type=simple
+User=prometheus
+# --storage.tsdb.path是可选项，默认数据目录在运行目录的./dada目录中
+ExecStart=/usr/local/prometheus/prometheus --config.file=/usr/local/prometheus/prometheus.yml --storage.tsdb.path=/var/lib/prometheus
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+
+<ul>
+<li>修改权限</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">chown prometheus:prometheus /usr/lib/systemd/system/prometheus.service
+</code></pre>
+
+<ul>
+<li>开启守护进程</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">systemctl enable prometheus
+</code></pre>
+
+<ul>
+<li>启动进程</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">systemctl start prometheus
+</code></pre>
+
+<h2 id="toc_9">使用</h2>
+
+<h3 id="toc_10">编译</h3>
+
+<ul>
+<li>下载</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">go get -u -v github.com/f1yegor/clickhouse_exporter
+</code></pre>
+
+<ul>
+<li>mac 下编译linux 系统软件</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">cd $GOPATH/github.com/f1yegor/clickhouse_exporter
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
+</code></pre>
+
+<h3 id="toc_11">启动</h3>
+
+<ul>
+<li>每台子节点机器都要添加这个任务</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">vim clickhouse_exporter.sh
+</code></pre>
+
+<ul>
+<li>添加内容</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">#!/usr/bin/env bash
+/usr/local/clickhouse_exporter/clickhouse_exporter -log.level=debug -scrape_uri=http://127.0.0.1:8123
+</code></pre>
+
+<ul>
+<li>启动脚本</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">chmod +x ./clickhouse_exporter.sh
+nohup clickhouse_exporter.sh &amp;
+</code></pre>
+
+<ul>
+<li>添加定时任务</li>
+</ul>
+
+<blockquote>
+<p>重新打开 prometheus ,修改配置文件<code>prometheus.yml</code>,增加配置<br/>
+此时,数据将会被prometheus所记录</p>
+</blockquote>
+
+<pre class="line-numbers"><code class="language-text">  - job_name: &#39;clickhouse&#39;
+    static_configs:
+    - targets: [&#39;10.0.0.1:9116&#39;]
+      labels:
+        instance: node-01
+    - targets: [&#39;10.0.0.2:9116&#39;]
+      labels:
+        instance: node-02
+    - targets: [&#39;10.0.0.3:9116&#39;]
+      labels:
+        instance: node-03
+</code></pre>
+
+<h2 id="toc_12">优化</h2>
+
+<h2 id="toc_13">总结</h2>
+
 
 		</div>
 
-	    <p class="meta">
-	    
-	        <a class="basic-alignment left" href="15543440484929.html" 
-	        title="Previous Post: 查看表占用磁盘空间大小">&laquo; 查看表占用磁盘空间大小</a>
-	    
-	    
-	        <a class="basic-alignment right" href="15529928360156.html" 
-	        title="Next Post: top命令常见的用法">top命令常见的用法 &raquo;</a>
-	    
-	    </p>
-	  </footer>
+		
+
 	</article>
+  
+	<div class="pagination">
+	
+<a href="archives.html">Blog Archives</a>
+	 
+	    
+	</div>
 </div>
  <aside class="sidebar"> 
 

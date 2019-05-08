@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <title>
     
-  go 语言类型推断 - 搁羽念风
+  golang - 搁羽念风
   
 
   </title>
@@ -78,14 +78,164 @@ $(document).ready(function(event) {
 </nav>
   <div id="main">
     <div id="content"> 
-<div>
-	<article class="hentry" role="article">
-	<header>
-			  	<h1 class="entry-title">go 语言类型推断</h1>
-				<p class="meta"><time datetime="2019-01-25T00:20:13+08:00" pubdate data-updated="true">2019/1/25</time></p>
-			 </header>
-		  	<div class="entry-content">
-			  	<h2 id="toc_0">执行之前动态确保一个结构体拥有某个方法</h2>
+<div class="blog-index">
+
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15572845291359.html">Go mod 使用教程</a></h1>
+			<p class="meta"><time datetime="2019-05-08T11:02:09+08:00" 
+			pubdate data-updated="true">2019/5/8</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">介绍&amp;优势</h2>
+
+<p><code>mod</code> 命令是在 go 1.11版本新增的命令,目的是取代<code>GOPATH</code>,提供go官方的包管理解决方案,使用户可以在非<code>$GOPATH/src</code> 目录下随意的构建项目</p>
+
+<ul>
+<li>使用mod命令后,将会在 项目目录下生成 一个 go.mod 文件,记录了go项目中引用的模块</li>
+<li>mod 功能启用时,使用的模块将存储在 <code>$GOPATH/pkg/mod</code>中,方便其他项目复用</li>
+<li>当然也可以选择使用<code>go mod vendor</code> 命令,项目依赖的模块,保存到项目目录下的 vendor目录中</li>
+</ul>
+
+<h2 id="toc_1">参数</h2>
+
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>download</td>
+<td>下载依赖的模块到本地缓存中</td>
+</tr>
+<tr>
+<td>edit</td>
+<td>编辑go.mod</td>
+</tr>
+<tr>
+<td>graph</td>
+<td>打印模块依赖图</td>
+</tr>
+<tr>
+<td>init</td>
+<td>在当前目录初始化 go.mod文件</td>
+</tr>
+<tr>
+<td>tidy</td>
+<td>下载缺少的模块, 移除不用的模块</td>
+</tr>
+<tr>
+<td>vendor</td>
+<td>将依赖从本地缓存复制一份到 ./vendor 目录中</td>
+</tr>
+<tr>
+<td>verify</td>
+<td>校验依赖是否正确</td>
+</tr>
+<tr>
+<td>why</td>
+<td>解释某个模块为什么被依赖</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="toc_2">开始使用</h2>
+
+<h3 id="toc_3">初始化</h3>
+
+<blockquote>
+<p>使用 <code>go mod init {项目名称}</code> 来对项目进行初始化<br/>
+<img src="media/15572845291359/15572860090461.jpg" alt=""/></p>
+
+<p><img src="media/15572845291359/15572860373991.jpg" alt=""/></p>
+</blockquote>
+
+<h2 id="toc_4">常用技巧</h2>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15519281018034.html">golang 的时间库常用语法</a></h1>
+			<p class="meta"><time datetime="2019-03-07T11:08:21+08:00" 
+			pubdate data-updated="true">2019/3/7</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<pre class="line-numbers"><code class="language-text">package main
+
+import (
+    &quot;fmt&quot;
+    &quot;time&quot;
+)
+
+// 月份 1,01,Jan,January
+// 日　 2,02,_2
+// 时　 3,03,15,PM,pm,AM,am
+// 分　 4,04
+// 秒　 5,05
+// 年　 06,2006
+// 周几 Mon,Monday
+// 时区时差表示 -07,-0700,Z0700,Z07:00,-07:00,MST
+// 时区字母缩写 MST
+
+func main() {
+    fmt.Println(time.Now().Zone())               // 时区
+    fmt.Println(time.Now().UnixNano())           // 从1970年1.1 至今的纳秒数
+    fmt.Println(time.Now().UnixNano() / 1000000) // 从1970年1.1 至今的毫秒数
+    fmt.Println(time.Now().Unix())               // 从1970年1.1 至今的秒数
+
+    // 时间戳转换为 Y-m-d H:i:s
+    ttt := time.Unix(1551926194, 0) // 参数1 毫秒, 参数2 纳秒,将毫秒,纳秒转化为 time类型
+    ts := ttt.Format(&quot;2006-01-02 15:04:05&quot;)
+    fmt.Println(ts) // 将time类型转化为 Y-m-d H:i:s
+
+    tt, _ := time.Parse(&quot;2006-01-02 15:04:05&quot;, ts)
+    fmt.Println(tt.Unix())
+    tt2 := tt.Add(3 * time.Hour)  // 给当前时间向前加3小时
+    tt3 := tt.Add(-3 * time.Hour) // 给当前时间向前加3小时
+    fmt.Println(tt2.Format(&quot;2006-01-02 15:04:05&quot;))
+    fmt.Println(tt3.Format(&quot;2006-01-02 15:04:05&quot;))
+
+    tt4 := tt.AddDate(3, 3, 3) // 给当前时间增加3年3个月3天
+    fmt.Println(tt4.Format(&quot;2006-01-02 15:04:05&quot;))
+
+    // 简易的定时器
+    tick := time.Tick(1 * time.Second)
+    for t := range tick {
+        // 时间格式化转化为 标准时间段 类似于php的 Y-m-d H:i:s
+        fmt.Println(t.Format(&quot;2006-01-02 15:04:05&quot;))
+    }
+}
+
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15483468139816.html">go 语言类型推断</a></h1>
+			<p class="meta"><time datetime="2019-01-25T00:20:13+08:00" 
+			pubdate data-updated="true">2019/1/25</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">执行之前动态确保一个结构体拥有某个方法</h2>
 
 <blockquote>
 <p>类型断言之后,只能使用接口里定义的方法<br/>
@@ -193,44 +343,58 @@ if v, ok := interface{}(x).(string); ok { // interface{}(x):把 x 的类型转�
 }
 </code></pre>
 
-			</div>
-
-		
-	  
-		<footer>
-		 <p class="meta">
-
-			<strong>Categories:</strong>&nbsp; 
-			<span class="categories">
-			
-			    <a class='category' href='golang.html'>golang</a>&nbsp;
-			 
-			</span>
-		    </p>
-		    <p class="meta">
-		      
-		 </p>
-	    
-		<div class="sharing">
-		  
-          
-
-          
 
 		</div>
 
-	    <p class="meta">
-	    
-	        <a class="basic-alignment left" href="15488420447689.html" 
-	        title="Previous Post: ">&laquo; </a>
-	    
-	    
-	        <a class="basic-alignment right" href="15482336668160.html" 
-	        title="Next Post: 应用 2：缓兵之计 —— 延时队列">应用 2：缓兵之计 —— 延时队列 &raquo;</a>
-	    
-	    </p>
-	  </footer>
+		
+
 	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15476981952811.html">goWeb 编程</a></h1>
+			<p class="meta"><time datetime="2019-01-17T12:09:55+08:00" 
+			pubdate data-updated="true">2019/1/17</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h3 id="toc_0">正文</h3>
+
+<blockquote>
+<p>go 网络服务</p>
+</blockquote>
+
+<pre class="line-numbers"><code class="language-go">package main
+
+import (
+    &quot;net/http&quot;
+    &quot;fmt&quot;
+)
+
+func test(w http.ResponseWrite,r *http.Request) {
+    fmt.Fprintf(w, &quot;hello world %s&quot;, r.URL.Path[1:])
+}
+
+func main() {
+    http.HandleFunc(&quot;/&quot;, test)
+    http.ListenAndServe(&quot;:8080&quot;, nil)
+}
+
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+  
+	<div class="pagination">
+	
+<a href="archives.html">Blog Archives</a>
+	 
+	    
+	</div>
 </div>
  <aside class="sidebar"> 
 
