@@ -82,6 +82,105 @@ $(document).ready(function(event) {
 
 	<article>
 		 <header>
+		  	<h1 class="entry-title"><a href="15529928360156.html">top命令常见的用法</a></h1>
+			<p class="meta"><time datetime="2019-03-19T18:53:56+08:00" 
+			pubdate data-updated="true">2019/3/19</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<blockquote>
+</blockquote>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15529898481691.html">架构之CDN相关</a></h1>
+			<p class="meta"><time datetime="2019-03-19T18:04:08+08:00" 
+			pubdate data-updated="true">2019/3/19</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">介绍</h2>
+
+<p>CDN使用背景，图片的分布式存储</p>
+
+<p>CDN 网络原理概述</p>
+
+<p>批量添加、切换 CDN 的步骤和注意事项</p>
+
+<p>多 CDN 切换的步骤和注意事项</p>
+
+<p>CDN 访问故障分析</p>
+
+<h2 id="toc_1">常见用法</h2>
+
+<h3 id="toc_2">图片和静态资源的缓存</h3>
+
+<h3 id="toc_3">一些变化不频繁的api缓存</h3>
+
+<h2 id="toc_4">原理</h2>
+
+<blockquote>
+<p><code>wget -S -O /dev/null https://wx2.sinaimg.cn/crop.0.0.2000.1125/005K1HRGly1fzfme5l6ltj31jk0v9wm4.jpg</code></p>
+</blockquote>
+
+<h3 id="toc_5">一) 请求dns解析,并cname到cdn厂商的域名</h3>
+
+<p><img src="media/15529898481691/15529924669316.jpg" alt="" style="width:1272px;"/></p>
+
+<h3 id="toc_6">二) 再次请求dns解析,并获取到cdn厂商的全局负载均衡ip列表</h3>
+
+<p><img src="media/15529898481691/15529924844889.jpg" alt="" style="width:1277px;"/></p>
+
+<h3 id="toc_7">三) 全局负载均衡 根据客户端的<code>ip</code>,<code>url</code> 等信息内部请求 <code>区域负载均衡系统</code></h3>
+
+<ol>
+<li> <code>区域负载均衡</code>根据信息,逐层查找,获取离客户端<code>最近&amp;有资源</code>的<code>缓存服务器</code>地址,</li>
+<li> 返回给<code>全局负载均衡</code>(回源发生在这个阶段)</li>
+<li> <code>全局负载均衡</code> 返回给客户端 该<code>缓存服务器</code>地址</li>
+</ol>
+
+<h3 id="toc_8">客户端请求<code>缓存服务器</code>,拿到文件</h3>
+
+<p><img src="media/15529898481691/15529924296541.jpg" alt="" style="width:960px;"/></p>
+
+<h2 id="toc_9">关键字</h2>
+
+<h3 id="toc_10">回源</h3>
+
+<blockquote>
+<p>回源的意思就是,回到源头服务器取资源, 因为cdn为多级缓存,当请求资源404时,将逐层向上级cdn缓存获取资源,直至到服务器源站查找资源</p>
+</blockquote>
+
+<h3 id="toc_11">资源获取方式</h3>
+
+<h4 id="toc_12">pull</h4>
+
+<blockquote>
+<p>逐层查找,资源不存在,最终到源头服务器获取资源并缓存到各级cdn</p>
+</blockquote>
+
+<h4 id="toc_13">push</h4>
+
+<blockquote>
+<p>源头服务器主动上传资源到cdn缓存服务器</p>
+</blockquote>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
 		  	<h1 class="entry-title"><a href="15524706279073.html">信号管理,当接收到关闭信号的时候,处理完最后的数据再关闭</a></h1>
 			<p class="meta"><time datetime="2019-03-13T17:50:27+08:00" 
 			pubdate data-updated="true">2019/3/13</time></p>
@@ -643,145 +742,6 @@ nohup clickhouse_exporter.sh &amp;
 		
 
 	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15488420447689.html"></a></h1>
-			<p class="meta"><time datetime="2019-01-30T17:54:04+08:00" 
-			pubdate data-updated="true">2019/1/30</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	
-
-		</div>
-
-		
-
-	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15483468139816.html">go 语言类型推断</a></h1>
-			<p class="meta"><time datetime="2019-01-25T00:20:13+08:00" 
-			pubdate data-updated="true">2019/1/25</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<h2 id="toc_0">执行之前动态确保一个结构体拥有某个方法</h2>
-
-<blockquote>
-<p>类型断言之后,只能使用接口里定义的方法<br/>
-比如 Runner 实际上有 <code>SetId</code> 和 <code>GetId</code> 两个方法<br/>
-但是 动态约束了 <code>demo.(interface{SetId(int64)})</code> 之后<br/>
-就只能使用<code>SetId</code> 这个方法了</p>
-</blockquote>
-
-<pre class="line-numbers"><code class="language-go">package main
-
-import (
-    &quot;fmt&quot;
-)
-
-type Runner struct {
-    Num int64
-}
-
-func (self *Runner) SetId(num int64) {
-    self.Num = num
-    fmt.Println(self.Num)
-}
-
-func (self *Runner) GetId() int64 {
-    return self.Num
-}
-
-func main() {
-    var demo interface{} = new(Runner)
-    
-    demo.(interface {
-        SetId(int64)
-    }).SetId(134)
-}
-
-</code></pre>
-
-<h2 id="toc_1">利用类型断言,确定变量的类型</h2>
-
-<blockquote>
-<p>可以根据不同的类型,进行不同的操作</p>
-</blockquote>
-
-<pre class="line-numbers"><code class="language-go">package main
-
-import (
-    &quot;fmt&quot;
-)
-
-func checkType(in interface{}) {
-
-    switch value := in.(type) {
-    case int:
-        fmt.Println(&quot;int&quot;, value)
-    case string:
-        fmt.Println(&quot;string&quot;, value)
-    default:
-        fmt.Println(&quot;unknow&quot;, value)
-    }
-}
-
-func main() {
-    ccc := 134
-    checkType(ccc)
-    ddd := &quot;133&quot;
-    checkType(ddd)
-    eee := []string{&quot;d&quot;, &quot;d&quot;, &quot;e&quot;}
-    checkType(eee)
-}
-
-</code></pre>
-
-<h2 id="toc_2">函数作为参数传递</h2>
-
-<blockquote>
-<p>函数作为参数传入 并且 被调函数, 参数类型为 interface{}时<br/>
-该函数是无法执行的<br/>
-将其进行类型转换,即可执行</p>
-</blockquote>
-
-<pre class="line-numbers"><code class="language-go">package main
-
-import &quot;fmt&quot;
-
-type Handler func(int, string, int) // 定义一个函数类型
-
-func demo(a int, b string, c int) {
-    fmt.Println(a, b, c)
-}
-
-func check(in interface{}) {
-    in.(Handler)(112, &quot;ccc&quot;, 222)
-}
-
-func main() {
-    check(Handler(demo))
-}
-</code></pre>
-
-<h2 id="toc_3">类型断言</h2>
-
-<pre class="line-numbers"><code class="language-go">x := &quot;hello world&quot;
-if v, ok := interface{}(x).(string); ok { // interface{}(x):把 x 的类型转换成 interface{}
-    fmt.Println(v)
-}
-</code></pre>
-
-
-		</div>
-
-		
-
-	</article>
   
 	<div class="pagination">
 	 <a class="prev" href="all_2.html">&larr; Older</a> 
@@ -835,7 +795,7 @@ if v, ok := interface{}(x).(string); ok { // interface{}(x):把 x 的类型转�
 	      </li>
 	  
 	      <li class="post">
-	        <a href="%E5%B7%A5%E5%85%B7.html"><strong>工具&nbsp;(1)</strong></a>
+	        <a href="%E5%B7%A5%E5%85%B7.html"><strong>工具&nbsp;(2)</strong></a>
 	        
 	        
 	        
@@ -863,6 +823,18 @@ if v, ok := interface{}(x).(string); ok { // interface{}(x):把 x 的类型转�
 	  
 	      
 		      <li class="post">
+		        <a href="15580141033211.html">常见的项目管理工具推荐</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15575570747233.html"></a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
 		        <a href="15572845291359.html">Go mod 使用教程</a>
 		      </li>
 	     
@@ -876,18 +848,6 @@ if v, ok := interface{}(x).(string); ok { // interface{}(x):把 x 的类型转�
 	      
 		      <li class="post">
 		        <a href="15560194068510.html">resful 最佳实践</a>
-		      </li>
-	     
-	  
-	      
-		      <li class="post">
-		        <a href="15554074466566.html">git 一些常用的命令</a>
-		      </li>
-	     
-	  
-	      
-		      <li class="post">
-		        <a href="15553150635573.html">给clickhouse 物化视图增加字段</a>
 		      </li>
 	     
 	  
