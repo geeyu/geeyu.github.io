@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <title>
     
-  linux - 搁羽念风
+  lua - 搁羽念风
   
 
   </title>
@@ -82,118 +82,17 @@ $(document).ready(function(event) {
 
 	<article>
 		 <header>
-		  	<h1 class="entry-title"><a href="15554074466566.html">git 一些常用的命令</a></h1>
-			<p class="meta"><time datetime="2019-04-16T17:37:26+08:00" 
-			pubdate data-updated="true">2019/4/16</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<h2 id="toc_0">删除错误的提交</h2>
-
-<pre class="line-numbers"><code class="language-text">// 重置改动到 某次提交
-git reset commit_id
-// 强制push, 远程的commit_id 之后的push将会被删掉
-git push --force
-</code></pre>
-
-
-		</div>
-
-		
-
-	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15529928360156.html">top命令常见的用法</a></h1>
-			<p class="meta"><time datetime="2019-03-19T18:53:56+08:00" 
-			pubdate data-updated="true">2019/3/19</time></p>
+		  	<h1 class="entry-title"><a href="15586915631306.html">对lua携程做超时时间</a></h1>
+			<p class="meta"><time datetime="2019-05-24T17:52:43+08:00" 
+			pubdate data-updated="true">2019/5/24</time></p>
 		 </header>
 	  	<div class="entry-content">
 		  	
 		  	<blockquote>
+<p>原理就是设置一个 定时携程,收到任意携程后,关闭整个所有携程,读取任务结果</p>
 </blockquote>
 
-
-		</div>
-
-		
-
-	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15529898481691.html">架构之CDN相关</a></h1>
-			<p class="meta"><time datetime="2019-03-19T18:04:08+08:00" 
-			pubdate data-updated="true">2019/3/19</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<h2 id="toc_0">介绍</h2>
-
-<p>CDN使用背景，图片的分布式存储</p>
-
-<p>CDN 网络原理概述</p>
-
-<p>批量添加、切换 CDN 的步骤和注意事项</p>
-
-<p>多 CDN 切换的步骤和注意事项</p>
-
-<p>CDN 访问故障分析</p>
-
-<h2 id="toc_1">常见用法</h2>
-
-<h3 id="toc_2">图片和静态资源的缓存</h3>
-
-<h3 id="toc_3">一些变化不频繁的api缓存</h3>
-
-<h2 id="toc_4">原理</h2>
-
-<blockquote>
-<p><code>wget -S -O /dev/null https://wx2.sinaimg.cn/crop.0.0.2000.1125/005K1HRGly1fzfme5l6ltj31jk0v9wm4.jpg</code></p>
-</blockquote>
-
-<h3 id="toc_5">一) 请求dns解析,并cname到cdn厂商的域名</h3>
-
-<p><img src="media/15529898481691/15529924669316.jpg" alt="" style="width:1272px;"/></p>
-
-<h3 id="toc_6">二) 再次请求dns解析,并获取到cdn厂商的全局负载均衡ip列表</h3>
-
-<p><img src="media/15529898481691/15529924844889.jpg" alt="" style="width:1277px;"/></p>
-
-<h3 id="toc_7">三) 全局负载均衡 根据客户端的<code>ip</code>,<code>url</code> 等信息内部请求 <code>区域负载均衡系统</code></h3>
-
-<ol>
-<li> <code>区域负载均衡</code>根据信息,逐层查找,获取离客户端<code>最近&amp;有资源</code>的<code>缓存服务器</code>地址,</li>
-<li> 返回给<code>全局负载均衡</code>(回源发生在这个阶段)</li>
-<li> <code>全局负载均衡</code> 返回给客户端 该<code>缓存服务器</code>地址</li>
-</ol>
-
-<h3 id="toc_8">客户端请求<code>缓存服务器</code>,拿到文件</h3>
-
-<p><img src="media/15529898481691/15529924296541.jpg" alt="" style="width:960px;"/></p>
-
-<h2 id="toc_9">关键字</h2>
-
-<h3 id="toc_10">回源</h3>
-
-<blockquote>
-<p>回源的意思就是,回到源头服务器取资源, 因为cdn为多级缓存,当请求资源404时,将逐层向上级cdn缓存获取资源,直至到服务器源站查找资源</p>
-</blockquote>
-
-<h3 id="toc_11">资源获取方式</h3>
-
-<h4 id="toc_12">pull</h4>
-
-<blockquote>
-<p>逐层查找,资源不存在,最终到源头服务器获取资源并缓存到各级cdn</p>
-</blockquote>
-
-<h4 id="toc_13">push</h4>
-
-<blockquote>
-<p>源头服务器主动上传资源到cdn缓存服务器</p>
-</blockquote>
+<p><img src="media/15586915631306/15586917264841.jpg" alt="" style="width:701px;"/></p>
 
 
 		</div>

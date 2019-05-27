@@ -82,6 +82,485 @@ $(document).ready(function(event) {
 
 	<article>
 		 <header>
+		  	<h1 class="entry-title"><a href="15560194068510.html">resful 最佳实践</a></h1>
+			<p class="meta"><time datetime="2019-04-23T19:36:46+08:00" 
+			pubdate data-updated="true">2019/4/23</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">url设计</h2>
+
+<ol>
+<li>推荐使用复数名词 <code>/employees/21</code></li>
+<li>在资源集合URL 上使用GET方法,更加直观 <code>GET  /employees?state=external</code></li>
+<li>对特定资源进行过滤, 将搜索字符串附加到查询参数中即可 <code>GET /employees?state=internal</code></li>
+</ol>
+
+<h2 id="toc_1">使用http方法操作资源(CURD)</h2>
+
+<blockquote>
+<p>这种方式可以用简洁的方式获取7种操作资源的方式<br/>
+如果一个请求是 indempotent(即发送两个一样的请求,后一个会覆盖前一个),此时使用PUT方法,否则使用POST方法</p>
+</blockquote>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Post(创建)</th>
+<th>GET(读取)</th>
+<th>PUT(更新)</th>
+<th>DELETE(删除)</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>/employees</td>
+<td>创建</td>
+<td>列出</td>
+<td>批量更新</td>
+<td>删除所有</td>
+</tr>
+<tr>
+<td>/employees/56</td>
+<td>X</td>
+<td>获取56号员工的信息</td>
+<td>更新56号员工的信息</td>
+<td>删除56号员工的信息</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="toc_2">非资源请求用动词</h2>
+
+<blockquote>
+<p>使用动词来区分资源和非资源,url中使用动词而非名词 <code>GET /translate?from=de_DE&amp;to=en_US&amp;text=Hallo</code><br/>
+增加资源动作控制参数 <code>PUT /articles/id?published=true</code><br/>
+把动作转换为一个可以操作的资源 例如github,&quot;喜欢&quot;一个gist,转换为增加一个<code>/gists/id/star</code>子资源,对其操作 <code>PUT /gists/id/star</code>,<code>DELETE /gists/:id/star</code></p>
+</blockquote>
+
+<h2 id="toc_3">使用标准 http 响应码</h2>
+
+<h3 id="toc_4">请求成功:</h3>
+
+<ul>
+<li>200 OK: 请求已成功,Body有返回内容, 用于 GET Method 的API 返回码</li>
+<li>201 Created: 请求已经被实现,资源被创建. 用于 POST Method的同步类型API返回码</li>
+<li>202 Accepted: 服务器已经接受请求,但尚未处理. 用于 POST Method的异步类型API返回码</li>
+<li>204 No Content: 服务器成功处理了请求,但没有返回任何内容, 用于 DELETE/PUT Method 的API的返回码</li>
+</ul>
+
+<h3 id="toc_5">因为客户端原因导致请求失败:</h3>
+
+<ul>
+<li>400 Bad Request: 如参数错误,格式错误</li>
+<li>401 Unauthorized: 用户未被认证, 如果密码错误,证书错误</li>
+<li>403 Forbidden: 用户权限不够</li>
+<li>404 Not Found: 服务器无此资源, 通常为URL不存在,或者某个Method不存在</li>
+<li>409 Conflict: 请求存在冲突,无法处理该请求 (比如某个资源禁止被再次修改,但请求想修改该资源,就要返回409)</li>
+</ul>
+
+<h3 id="toc_6">因服务端原因导致请求失败:</h3>
+
+<ul>
+<li>500 Internal Server Error: 服务端错误消息,服务器遇到一个未曾预料的状况</li>
+<li>501 Not Implemented: 服务器不支持当前请求所需要的某个功能</li>
+<li>503 Service Unavailable: 如服务器维护中或者过载等</li>
+</ul>
+
+<h2 id="toc_7">返回有用的提示信息</h2>
+
+<h3 id="toc_8">除了合适的状态码之外,还应当在正文中提供有用的错误提示和详细的描述</h3>
+
+<pre class="line-numbers"><code class="language-javascript">   // 400 Bad Request
+   {
+    &quot;message&quot;: &quot;You submitted an invalid state. Valid state values are &#39;internal&#39; or &#39;external&#39;&quot;,
+    &quot;errorCode&quot;: 352,
+    &quot;additionalInformation&quot; :&quot;http://www.domain.com/rest/errorcode/352&quot;
+   }
+</code></pre>
+
+<h3 id="toc_9">响应中提供浏览其他API的链接</h3>
+
+<blockquote>
+<p>如,在响应参数中添加一个 links 字段，让客户端可以自动变更,也可以自我描述,需要提供的文档更少</p>
+</blockquote>
+
+<pre class="line-numbers"><code class="language-javascript">{
+  &quot;id&quot;:1,
+  &quot;name&quot;:&quot;Paul&quot;,
+  &quot;links&quot;: [
+     {
+        &quot;rel&quot;: &quot;salary&quot;,
+        &quot;href&quot;: &quot;/employees/1/salaryStatements&quot;
+     }
+  ]
+}
+</code></pre>
+
+<h3 id="toc_10">提供分页信息</h3>
+
+<blockquote>
+<p>资源较多时,可以用 <code>page</code>,<code>page_size</code> 来提供分页 <code>/employees?page=30&amp;page_size=15 #返回 30 到 45 的员工</code><br/>
+还可以添加上一页和下一页的链接示例</p>
+</blockquote>
+
+<pre class="line-numbers"><code class="language-text">   GET /employees?offset=20&amp;limit=10
+   {
+   &quot;offset&quot;: 20,
+   &quot;limit&quot;: 10,
+   &quot;total&quot;: 3465,
+   &quot;employees&quot;: [
+    //...
+   ],
+   &quot;links&quot;: [
+     {
+        &quot;rel&quot;: &quot;nextPage&quot;,
+        &quot;href&quot;: &quot;/employees?offset=30&amp;limit=10&quot;
+     },
+     {
+        &quot;rel&quot;: &quot;previousPage&quot;,
+        &quot;href&quot;: &quot;/employees?offset=10&amp;limit=10&quot;
+     }
+   ]
+   }
+</code></pre>
+
+<h2 id="toc_11">使用https</h2>
+
+<blockquote>
+<p>禁止非ssl的url重定向到ssl的url</p>
+</blockquote>
+
+<h2 id="toc_12">授权</h2>
+
+<ul>
+<li>验证(Authentication) 为了确定用户申明的身份</li>
+<li>授权(Authorization) 为用户增加某个资源的操作权限</li>
+</ul>
+
+<h2 id="toc_13">Location</h2>
+
+<p>在响应的header中使用,一般为客户端感兴趣的资源url,如果成功创建一个资源后,把新资源url放在Location中<br/>
+异步创建请求,也可以在响应 202的同时,添加一个可以异步状态查询的地址</p>
+
+<h2 id="toc_14">API地址</h2>
+
+<p>在url中指定API的版本号 <code>https://api.github.com/v3</code><br/>
+如果api变化很大,可以把api设计为子域名 <code>https://v3.api.demo.com</code><br/>
+不需要次级版本,只有当接口不兼容,才应该变更版本号</p>
+
+<h3 id="toc_15">两种实现方式</h3>
+
+<ul>
+<li> url中 如<code>https://example.com/api/v1</code>, 
+<ul>
+<li>版本明确,方便调试</li>
+<li>不同版本协议解析可以放在不同的服务器上</li>
+<li>不用考虑协议兼容性,开发简便,升级不受影响</li>
+</ul></li>
+<li>HTTP Header 中
+<ul>
+<li>url简洁干净,符合RESTful惯例</li>
+</ul></li>
+</ul>
+
+<h2 id="toc_16">连字符</h2>
+
+<p>url 中应该尽量使用 &quot;-&quot; 来代替下划线&quot;_&quot;的使用,如<br/>
+<code>http://api.example.restapi.org/blogs/mark-masse/entries/this-is-my-first-post</code></p>
+
+<h2 id="toc_17">大小写</h2>
+
+<p>根据 RFC3986 定义，URI 是对大小写敏感的，所以为了避免歧义，我们尽量用小写字符</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15554074466566.html">git 一些常用的命令</a></h1>
+			<p class="meta"><time datetime="2019-04-16T17:37:26+08:00" 
+			pubdate data-updated="true">2019/4/16</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">删除错误的提交</h2>
+
+<pre class="line-numbers"><code class="language-text">// 重置改动到 某次提交
+git reset commit_id
+// 强制push, 远程的commit_id 之后的push将会被删掉
+git push --force
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15553150635573.html">给clickhouse 物化视图增加字段</a></h1>
+			<p class="meta"><time datetime="2019-04-15T15:57:43+08:00" 
+			pubdate data-updated="true">2019/4/15</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<pre class="line-numbers"><code class="language-sql">-- 先查找一下sql路径
+SELECT metadata_path FROM system.tables WHERE name = &#39;demo&#39;;
+
+-- 摘除掉视图
+DETACH table mid.play_block_status
+
+-- 为 .inner.demo 表增加字段
+alter table mid.`.inner.demo` add column ip String;
+alter table mid.`.inner.demo` add column operator String;
+
+-- 为 物化视图增加字段
+根据第一步 查到的 metadata_path 路径, 为视图修改表结构
+
+-- 重新加载视图
+ATTACH table mid.play_block_status
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15548815336055.html">php相关函数</a></h1>
+			<p class="meta"><time datetime="2019-04-10T15:32:13+08:00" 
+			pubdate data-updated="true">2019/4/10</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h3 id="toc_0">umask() 函数,改变umask值,使进程权限保持一致</h3>
+
+<pre class="line-numbers"><code class="language-text">编写linux守护进程的时候,需要设置umask 这个值,用户权限屏蔽位, 
+当用户创建目录或者文件的时候,会有一个预设的权限 r=4,w=2,x=1
+目录的预设权限是：0777 drwxrwxrwx
+文件的预设权限为: 0666 -rw-rw-rw-
+
+用这个权限减去 umask的权限,就是新建的目录或者文件的实际权限了
+umask 默认值为  0022
+新建文件夹权限为  0777 - 0022 = 0755
+新建文件权限为   0666 - 0022 = 0644
+</code></pre>
+
+<h3 id="toc_1">pcntl_fork() 函数,在进程的当前位置产生分支(子进程)</h3>
+
+<p>在当前进程的当前位置 产生分支(子进程), 都从fork位置继续执行, <br/>
+成功时<br/>
+    父进程执行过程中得到的fork返回值为子进程号,子进程得到的是0<br/>
+失败时<br/>
+    父进程将会返回 -1,不会创建子进程,并引发一个php错误</p>
+
+<h3 id="toc_2">posix_setsid() 新建一个session终端,脱离原有终端的控制</h3>
+
+<p>成功时<br/>
+    返回 session_id<br/>
+失败时<br/>
+    返回 -1</p>
+
+<h3 id="toc_3">php_sapi_name() 判断运行时环境</h3>
+
+<h3 id="toc_4">extension_loaded() 检查一个扩展是否已经加载</h3>
+
+<h3 id="toc_5">cli_set_process_title()</h3>
+
+<p>为进程设定title <br/>
+成功时<br/>
+    返回 true<br/>
+失败时<br/>
+    返回 false</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15543440484929.html">查看表占用磁盘空间大小</a></h1>
+			<p class="meta"><time datetime="2019-04-04T10:14:08+08:00" 
+			pubdate data-updated="true">2019/4/4</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<pre class="line-numbers"><code class="language-sql">SELECT table, formatReadableSize(size) as size, rows, days, formatReadableSize(avgDaySize) as avgDaySize FROM (
+    SELECT
+        table,
+        sum(bytes) AS size,
+        sum(rows) AS rows,
+        min(min_date) AS min_date,
+        max(max_date) AS max_date,
+        (max_date - min_date) AS days,
+        size / (max_date - min_date) AS avgDaySize
+    FROM system.parts
+    WHERE active
+    GROUP BY table
+    ORDER BY rows DESC
+)
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15540894210258.html">php 生成uuid的统一类</a></h1>
+			<p class="meta"><time datetime="2019-04-01T11:30:21+08:00" 
+			pubdate data-updated="true">2019/4/1</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<pre class="line-numbers"><code class="language-php">&lt;?php
+class UUID {
+  public static function v3($namespace, $name) {
+    if(!self::is_valid($namespace)) return false;
+
+    // Get hexadecimal components of namespace
+    $nhex = str_replace(array(&#39;-&#39;,&#39;{&#39;,&#39;}&#39;), &#39;&#39;, $namespace);
+
+    // Binary Value
+    $nstr = &#39;&#39;;
+
+    // Convert Namespace UUID to bits
+    for($i = 0; $i &lt; strlen($nhex); $i+=2) {
+      $nstr .= chr(hexdec($nhex[$i].$nhex[$i+1]));
+    }
+
+    // Calculate hash value
+    $hash = md5($nstr . $name);
+
+    return sprintf(&#39;%08s-%04s-%04x-%04x-%12s&#39;,
+
+      // 32 bits for &quot;time_low&quot;
+      substr($hash, 0, 8),
+
+      // 16 bits for &quot;time_mid&quot;
+      substr($hash, 8, 4),
+
+      // 16 bits for &quot;time_hi_and_version&quot;,
+      // four most significant bits holds version number 3
+      (hexdec(substr($hash, 12, 4)) &amp; 0x0fff) | 0x3000,
+
+      // 16 bits, 8 bits for &quot;clk_seq_hi_res&quot;,
+      // 8 bits for &quot;clk_seq_low&quot;,
+      // two most significant bits holds zero and one for variant DCE1.1
+      (hexdec(substr($hash, 16, 4)) &amp; 0x3fff) | 0x8000,
+
+      // 48 bits for &quot;node&quot;
+      substr($hash, 20, 12)
+    );
+  }
+
+  public static function v4() {
+    return sprintf(&#39;%04x%04x-%04x-%04x-%04x-%04x%04x%04x&#39;,
+
+      // 32 bits for &quot;time_low&quot;
+      mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+
+      // 16 bits for &quot;time_mid&quot;
+      mt_rand(0, 0xffff),
+
+      // 16 bits for &quot;time_hi_and_version&quot;,
+      // four most significant bits holds version number 4
+      mt_rand(0, 0x0fff) | 0x4000,
+
+      // 16 bits, 8 bits for &quot;clk_seq_hi_res&quot;,
+      // 8 bits for &quot;clk_seq_low&quot;,
+      // two most significant bits holds zero and one for variant DCE1.1
+      mt_rand(0, 0x3fff) | 0x8000,
+
+      // 48 bits for &quot;node&quot;
+      mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+    );
+  }
+
+  public static function v5($namespace, $name) {
+    if(!self::is_valid($namespace)) return false;
+
+    // Get hexadecimal components of namespace
+    $nhex = str_replace(array(&#39;-&#39;,&#39;{&#39;,&#39;}&#39;), &#39;&#39;, $namespace);
+
+    // Binary Value
+    $nstr = &#39;&#39;;
+
+    // Convert Namespace UUID to bits
+    for($i = 0; $i &lt; strlen($nhex); $i+=2) {
+      $nstr .= chr(hexdec($nhex[$i].$nhex[$i+1]));
+    }
+
+    // Calculate hash value
+    $hash = sha1($nstr . $name);
+
+    return sprintf(&#39;%08s-%04s-%04x-%04x-%12s&#39;,
+
+      // 32 bits for &quot;time_low&quot;
+      substr($hash, 0, 8),
+
+      // 16 bits for &quot;time_mid&quot;
+      substr($hash, 8, 4),
+
+      // 16 bits for &quot;time_hi_and_version&quot;,
+      // four most significant bits holds version number 5
+      (hexdec(substr($hash, 12, 4)) &amp; 0x0fff) | 0x5000,
+
+      // 16 bits, 8 bits for &quot;clk_seq_hi_res&quot;,
+      // 8 bits for &quot;clk_seq_low&quot;,
+      // two most significant bits holds zero and one for variant DCE1.1
+      (hexdec(substr($hash, 16, 4)) &amp; 0x3fff) | 0x8000,
+
+      // 48 bits for &quot;node&quot;
+      substr($hash, 20, 12)
+    );
+  }
+
+  public static function is_valid($uuid) {
+    return preg_match(&#39;/^\{?[0-9a-f]{8}\-?[0-9a-f]{4}\-?[0-9a-f]{4}\-?&#39;.
+                      &#39;[0-9a-f]{4}\-?[0-9a-f]{12}\}?$/i&#39;, $uuid) === 1;
+  }
+}
+
+// Usage
+// Named-based UUID.
+
+$v3uuid = UUID::v3(&#39;1546058f-5a25-4334-85ae-e68f2a44bbaf&#39;, &#39;SomeRandomString&#39;);
+$v5uuid = UUID::v5(&#39;1546058f-5a25-4334-85ae-e68f2a44bbaf&#39;, &#39;SomeRandomString&#39;);
+
+// Pseudo-random UUID
+
+$v4uuid = UUID::v4();
+?&gt;
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
 		  	<h1 class="entry-title"><a href="15529928360156.html">top命令常见的用法</a></h1>
 			<p class="meta"><time datetime="2019-03-19T18:53:56+08:00" 
 			pubdate data-updated="true">2019/3/19</time></p>
@@ -285,463 +764,6 @@ func main() {
 		
 
 	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15514283796439.html">类mysql order 多值排序</a></h1>
-			<p class="meta"><time datetime="2019-03-01T16:19:39+08:00" 
-			pubdate data-updated="true">2019/3/1</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<pre class="line-numbers"><code class="language-php">
-function orderBy($data, $orders) {
-    $sorts = [
-        &#39;desc&#39; =&gt; SORT_DESC,
-        &#39;asc&#39; =&gt; SORT_ASC
-    ];
-    $tmp = [];
-    foreach ($orders as $order =&gt; $sort) {
-        $cols = array_column($data, $order);
-        if(!isset($sorts[$sort])) {
-            return $data;
-        }
-        $tmp[] = $cols;
-        $tmp[] = $sorts[$sort];
-    }
-    $tmp[] = $data;
-    call_user_func_array(&#39;array_multisort&#39;, $tmp);
-    // array_multisort($cols, $sorts[$sort], $data);
-    print_r($data);
-    return $data;
-}
-
-$data = [
-    [&#39;score&#39;=&gt;2, &#39;date&#39;=&gt;&#39;2015&#39;],
-    [&#39;score&#39;=&gt;2, &#39;date&#39;=&gt;&#39;2014&#39;],
-    [&#39;score&#39;=&gt;1, &#39;date&#39;=&gt;&#39;2017&#39;],
-    [&#39;score&#39;=&gt;3, &#39;date&#39;=&gt;&#39;2014&#39;],
-];
-
-$order = [
-    &#39;score&#39; =&gt; &#39;asc&#39;,
-    &#39;date&#39; =&gt; &#39;desc&#39;
-];
-
-
-$order = orderBy($data, $order);
-</code></pre>
-
-
-		</div>
-
-		
-
-	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15512397780424.html">cellnet 网络框架,源码解读</a></h1>
-			<p class="meta"><time datetime="2019-02-27T11:56:18+08:00" 
-			pubdate data-updated="true">2019/2/27</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<pre class="line-numbers"><code class="language-text">├── cellnet
-│   ├── codec               // 编码格式
-│   │   └── json            // json格式编码包
-│   │       └── json.go     // json格式适配器
-│   ├── codec.go            // 编码适配器
-│   ├── internal            // 中文意思,内部,此处是内部用函数包的意思
-│   │   ├── log.go          // 记录日志,初始化
-│   │   └── sesmgr.go       // 会话管理功能的包, 包括增加,移除,获取,遍历,统计等功能
-│   ├── log.go              // 记录日志,初始化
-│   ├── meta.go             // 目标消息体
-│   ├── packet              // 封包解包库
-│   │   ├── log.go          // 记录日志,初始化
-│   │   ├── packet.go       // 核心的封包解包器,2个功能,接收变长包,发送变长包
-│   │   ├── pktreader.go    // Packet,Reader 包数据阅读器
-│   │   ├── pktwriter.go    // Packet,Writer 包数据写入器
-│   │   ├── recv.go         // 接收, length-type-value 封包数据
-│   │   ├── send.go         // 发送, length-type-value 封包数据
-│   │   └── setup.go        // 启动封包器,设定回调进程
-│   ├── peer.go             // 会话管理器
-│   ├── queue.go            // 事件循环队列
-│   ├── socket
-│   │   ├── acceptor.go     // 侦听端口,建立session,管理session,监听端口等
-│   │   ├── connector.go    // 连接器, 开始连接,结束连接,获取session
-│   │   ├── event.go        // 定义了各种事件发生时的结构体
-│   │   ├── log.go          // 记录日志,初始化
-│   │   ├── peer.go         // socket端口,名称,队列,派发事件
-│   │   └── session.go      // 原始连接,同步器,通讯端口,消息队列
-│   └── test
-│       └── test_test.go    // 测试
-└── chat
-    ├── client
-    │   └── main.go         // 客户端
-    ├── proto
-    │   └── chat.go         // 消息通讯格式
-    └── server
-        └── main.go         // 服务器
-
-</code></pre>
-
-<h2 id="toc_0">客户端分析</h2>
-
-
-		</div>
-
-		
-
-	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15511647865786.html">clickhouse 奇技淫巧</a></h1>
-			<p class="meta"><time datetime="2019-02-26T15:06:26+08:00" 
-			pubdate data-updated="true">2019/2/26</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<h2 id="toc_0">函数</h2>
-
-<blockquote>
-<p><code>positionCaseInsensitive</code> 不区分大小写,查找字符串的所在位置, 未找到则为0<br/>
-<code>positionCaseInsensitiveUTF8</code> 同上,不过汉字也算作一个字符<br/>
-<code>cityHash64</code> 快速哈希,规则相同<br/>
-<code>groupArray</code> 根据group 将一个或者多个字段合并成数组<br/>
-<code>intDiv</code> 整除,intDiv(时间戳, 3600)*3600 即可按照每小时分组</p>
-</blockquote>
-
-<h2 id="toc_1">常用</h2>
-
-<blockquote>
-<p><code>optimize table 表名</code> 如果是一个 聚合类型表,那么可以将主动触发一次聚合</p>
-</blockquote>
-
-
-		</div>
-
-		
-
-	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15510618792149.html">prometheus 安装部署</a></h1>
-			<p class="meta"><time datetime="2019-02-25T10:31:19+08:00" 
-			pubdate data-updated="true">2019/2/25</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<h2 id="toc_0">介绍</h2>
-
-<p>Prometheus是一套开源的监控&amp;报警&amp;时间序列数据库的组合,起始是由SoundCloud公司开发的。成立于2012年，之后许多公司和组织接受和采用prometheus,他们便将它独立成开源项目，并且有公司来运作.该项目有非常活跃的社区和开发人员，目前是独立的开源项目，任何公司都可以使用它，2016年，Prometheus加入了云计算基金会，成为kubernetes之后的第二个托管项目.google SRE的书内也曾提到跟他们BorgMon监控系统相似的实现是Prometheus。现在最常见的Kubernetes容器管理系统中，通常会搭配Prometheus进行监控。</p>
-
-<h2 id="toc_1">数据类型</h2>
-
-<h3 id="toc_2">Counter</h3>
-
-<ul>
-<li>用于累计值,请求次数,完成数等</li>
-<li>一直增加,不会减少</li>
-<li>重启后,会被重置</li>
-</ul>
-
-<h3 id="toc_3">Gauge</h3>
-
-<ul>
-<li>Gauge 常规数值, 温度变化,CPU,内存,网络变化</li>
-<li>可变大,可变小</li>
-<li>重启进程后,重置</li>
-</ul>
-
-<h3 id="toc_4">Histogram</h3>
-
-<ul>
-<li>直方图,跟踪时间发生,请求持续时间或响应时间的规模</li>
-<li>可对记录内容分组,提供 count和 sum 全部值的功能</li>
-</ul>
-
-<h3 id="toc_5">Summary</h3>
-
-<p>在prometheus中,任何可被采集的目标都被称为instance,相同类型的instance的集合被称为job</p>
-
-<pre class="line-numbers"><code class="language-text">- job: api-server
-    - instance1: 1.2.3.4:5670
-    - instance2: 1.2.3.4:5671
-    - instance3: 5.6.7.8:5670
-    - instance3: 5.6.7.8:5671
-</code></pre>
-
-<h2 id="toc_6">下载</h2>
-
-<pre class="line-numbers"><code class="language-text">wget https://github.com/prometheus/prometheus/releases/download/v2.7.1/prometheus-2.7.1.linux-amd64.tar.gz
-</code></pre>
-
-<h2 id="toc_7">安装</h2>
-
-<ul>
-<li>解压</li>
-</ul>
-
-<pre class="line-numbers"><code class="language-text">tar -zxvf prometheus-2.7.1.linux-amd64.tar.gz 
-</code></pre>
-
-<ul>
-<li>创建目录</li>
-</ul>
-
-<pre class="line-numbers"><code class="language-text">mv ./prometheus-2.7.1.linux-amd64 /usr/local/prometheus
-</code></pre>
-
-<ul>
-<li>创建用户和用户组</li>
-</ul>
-
-<pre class="line-numbers"><code class="language-text">groupadd prometheus
-useradd -g prometheus -s /sbin/nologin prometheus
-</code></pre>
-
-<h2 id="toc_8">配置开机启动&amp;守护进程</h2>
-
-<ul>
-<li>创建文件</li>
-</ul>
-
-<pre class="line-numbers"><code class="language-text"> vim /usr/lib/systemd/system/prometheus.service
-</code></pre>
-
-<ul>
-<li>添加内容</li>
-</ul>
-
-<pre class="line-numbers"><code class="language-text"> [Unit]
-Description=Prometheus
-Documentation=https://prometheus.io/
-After=network.target
-
-[Service]
-# Type设置为notify时，服务会不断重启
-Type=simple
-User=prometheus
-# --storage.tsdb.path是可选项，默认数据目录在运行目录的./dada目录中
-ExecStart=/usr/local/prometheus/prometheus --config.file=/usr/local/prometheus/prometheus.yml --storage.tsdb.path=/var/lib/prometheus
-Restart=on-failure
-
-[Install]
-WantedBy=multi-user.target
-</code></pre>
-
-<ul>
-<li>修改权限</li>
-</ul>
-
-<pre class="line-numbers"><code class="language-text">chown prometheus:prometheus /usr/lib/systemd/system/prometheus.service
-</code></pre>
-
-<ul>
-<li>开启守护进程</li>
-</ul>
-
-<pre class="line-numbers"><code class="language-text">systemctl enable prometheus
-</code></pre>
-
-<ul>
-<li>启动进程</li>
-</ul>
-
-<pre class="line-numbers"><code class="language-text">systemctl start prometheus
-</code></pre>
-
-<h2 id="toc_9">使用</h2>
-
-<h3 id="toc_10">编译</h3>
-
-<ul>
-<li>下载</li>
-</ul>
-
-<pre class="line-numbers"><code class="language-text">go get -u -v github.com/f1yegor/clickhouse_exporter
-</code></pre>
-
-<ul>
-<li>mac 下编译linux 系统软件</li>
-</ul>
-
-<pre class="line-numbers"><code class="language-text">cd $GOPATH/github.com/f1yegor/clickhouse_exporter
-CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
-</code></pre>
-
-<h3 id="toc_11">启动</h3>
-
-<ul>
-<li>每台子节点机器都要添加这个任务</li>
-</ul>
-
-<pre class="line-numbers"><code class="language-text">vim clickhouse_exporter.sh
-</code></pre>
-
-<ul>
-<li>添加内容</li>
-</ul>
-
-<pre class="line-numbers"><code class="language-text">#!/usr/bin/env bash
-/usr/local/clickhouse_exporter/clickhouse_exporter -log.level=debug -scrape_uri=http://127.0.0.1:8123
-</code></pre>
-
-<ul>
-<li>启动脚本</li>
-</ul>
-
-<pre class="line-numbers"><code class="language-text">chmod +x ./clickhouse_exporter.sh
-nohup clickhouse_exporter.sh &amp;
-</code></pre>
-
-<ul>
-<li>添加定时任务</li>
-</ul>
-
-<blockquote>
-<p>重新打开 prometheus ,修改配置文件<code>prometheus.yml</code>,增加配置<br/>
-此时,数据将会被prometheus所记录</p>
-</blockquote>
-
-<pre class="line-numbers"><code class="language-text">  - job_name: &#39;clickhouse&#39;
-    static_configs:
-    - targets: [&#39;10.0.0.1:9116&#39;]
-      labels:
-        instance: node-01
-    - targets: [&#39;10.0.0.2:9116&#39;]
-      labels:
-        instance: node-02
-    - targets: [&#39;10.0.0.3:9116&#39;]
-      labels:
-        instance: node-03
-</code></pre>
-
-<h2 id="toc_12">优化</h2>
-
-<h2 id="toc_13">总结</h2>
-
-
-		</div>
-
-		
-
-	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15490763418639.html">下拉框统一查询接口</a></h1>
-			<p class="meta"><time datetime="2019-02-02T10:59:01+08:00" 
-			pubdate data-updated="true">2019/2/2</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<h2 id="toc_0">描述</h2>
-
-<blockquote>
-<p>在设计数据查询后台时,经常会遇到一些下拉菜单,需要进行筛选,所以常常需要写一些数据查询接口,这样的接口写多了以后,就需要将其统一抽象起来,方便使用<br/>
-所以编写了这样一套统一api接口</p>
-</blockquote>
-
-<h3 id="toc_1">使用方法</h3>
-
-<h4 id="toc_2">请求地址</h4>
-
-<p><code>/api/fields/any</code></p>
-
-<h4 id="toc_3">请求方式</h4>
-
-<p><strong>GET</strong></p>
-
-<h4 id="toc_4">请求参数</h4>
-
-<table>
-<thead>
-<tr>
-<th>字段</th>
-<th>类型</th>
-<th>描述</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td>table</td>
-<td>string</td>
-<td>指定表名称,可以是抽象表</td>
-</tr>
-<tr>
-<td>field</td>
-<td>string</td>
-<td>指定要取出的字段, 可以是抽象字段</td>
-</tr>
-<tr>
-<td>type</td>
-<td>string</td>
-<td>目前只有 kv, v</td>
-</tr>
-<tr>
-<td>profiex</td>
-<td>string</td>
-<td>字段名添加统一前缀</td>
-</tr>
-</tbody>
-</table>
-
-<h2 id="toc_5">配置参数</h2>
-
-<h3 id="toc_6">前置查询</h3>
-
-<h3 id="toc_7">后置查询</h3>
-
-<h3 id="toc_8">虚拟字段</h3>
-
-<h3 id="toc_9">回调函数</h3>
-
-<h3 id="toc_10">返回格式指定</h3>
-
-
-		</div>
-
-		
-
-	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15488420618155.html">kancloud 文档下载器</a></h1>
-			<p class="meta"><time datetime="2019-01-30T17:54:21+08:00" 
-			pubdate data-updated="true">2019/1/30</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<h2 id="toc_0">介绍</h2>
-
-<blockquote>
-<p>最近在 <strong>kancloud(看云)</strong> 上看到一个关于 go语言的文档感觉质量非常不错,但是作者并没有开启下载功能,但我的大部分阅读时间,都是在地铁上,用ipad观看<br/>
-简单看了下看云的api, 决定用 <code>nodejs</code> + <code>gitbook</code> 制作一个 pdf下载器</p>
-</blockquote>
-
-<h2 id="toc_1">安装</h2>
-
-<blockquote>
-</blockquote>
-
-<h2 id="toc_2">使用</h2>
-
-<h2 id="toc_3">功能</h2>
-
-<h2 id="toc_4">利用 gitbook</h2>
-
-
-		</div>
-
-		
-
-	</article>
   
 	<div class="pagination">
 	 <a class="prev" href="all_2.html">&larr; Older</a> 
@@ -775,8 +797,12 @@ nohup clickhouse_exporter.sh &amp;
 	      </li>
 	  
 	      <li class="post">
-	        <a href="%E4%B8%AD%E9%97%B4%E4%BB%B6.html"><strong>中间件&nbsp;(1)</strong></a>
+	        <a href="%E4%B8%AD%E9%97%B4%E4%BB%B6.html"><strong>中间件&nbsp;(6)</strong></a>
 	         <p class="cat-children-p"> 
+	        
+	        	<a href="%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97.html">消息队列&nbsp;(4)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E6%95%B0%E6%8D%AE%E6%B8%85%E6%B4%97.html">数据清洗&nbsp;(1)</a>&nbsp;&nbsp;
 	        
 	        	<a href="%E7%9B%91%E6%8E%A7%E6%8A%A5%E8%AD%A6.html">监控报警&nbsp;(1)</a>&nbsp;&nbsp;
 	        
@@ -784,8 +810,10 @@ nohup clickhouse_exporter.sh &amp;
 	      </li>
 	  
 	      <li class="post">
-	        <a href="%E8%AF%AD%E8%A8%80.html"><strong>语言&nbsp;(8)</strong></a>
+	        <a href="%E8%AF%AD%E8%A8%80.html"><strong>语言&nbsp;(9)</strong></a>
 	         <p class="cat-children-p"> 
+	        
+	        	<a href="lua.html">lua&nbsp;(1)</a>&nbsp;&nbsp;
 	        
 	        	<a href="php.html">php&nbsp;(4)</a>&nbsp;&nbsp;
 	        
@@ -823,31 +851,31 @@ nohup clickhouse_exporter.sh &amp;
 	  
 	      
 		      <li class="post">
-		        <a href="15580141033211.html">常见的项目管理工具推荐</a>
+		        <a href="15589244025963.html">大数据架构</a>
 		      </li>
 	     
 	  
 	      
 		      <li class="post">
-		        <a href="15575570747233.html"></a>
+		        <a href="15586915631306.html">对lua携程做超时时间</a>
 		      </li>
 	     
 	  
 	      
 		      <li class="post">
-		        <a href="15572845291359.html">Go mod 使用教程</a>
+		        <a href="15586915348117.html"></a>
 		      </li>
 	     
 	  
 	      
 		      <li class="post">
-		        <a href="15560743380263.html">深度思维笔记</a>
+		        <a href="15586818694083.html">nsq简介</a>
 		      </li>
 	     
 	  
 	      
 		      <li class="post">
-		        <a href="15560194068510.html">resful 最佳实践</a>
+		        <a href="15585794233066.html">mac 安装nsq</a>
 		      </li>
 	     
 	  

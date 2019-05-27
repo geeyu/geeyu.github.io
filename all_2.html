@@ -82,6 +82,463 @@ $(document).ready(function(event) {
 
 	<article>
 		 <header>
+		  	<h1 class="entry-title"><a href="15514283796439.html">类mysql order 多值排序</a></h1>
+			<p class="meta"><time datetime="2019-03-01T16:19:39+08:00" 
+			pubdate data-updated="true">2019/3/1</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<pre class="line-numbers"><code class="language-php">
+function orderBy($data, $orders) {
+    $sorts = [
+        &#39;desc&#39; =&gt; SORT_DESC,
+        &#39;asc&#39; =&gt; SORT_ASC
+    ];
+    $tmp = [];
+    foreach ($orders as $order =&gt; $sort) {
+        $cols = array_column($data, $order);
+        if(!isset($sorts[$sort])) {
+            return $data;
+        }
+        $tmp[] = $cols;
+        $tmp[] = $sorts[$sort];
+    }
+    $tmp[] = $data;
+    call_user_func_array(&#39;array_multisort&#39;, $tmp);
+    // array_multisort($cols, $sorts[$sort], $data);
+    print_r($data);
+    return $data;
+}
+
+$data = [
+    [&#39;score&#39;=&gt;2, &#39;date&#39;=&gt;&#39;2015&#39;],
+    [&#39;score&#39;=&gt;2, &#39;date&#39;=&gt;&#39;2014&#39;],
+    [&#39;score&#39;=&gt;1, &#39;date&#39;=&gt;&#39;2017&#39;],
+    [&#39;score&#39;=&gt;3, &#39;date&#39;=&gt;&#39;2014&#39;],
+];
+
+$order = [
+    &#39;score&#39; =&gt; &#39;asc&#39;,
+    &#39;date&#39; =&gt; &#39;desc&#39;
+];
+
+
+$order = orderBy($data, $order);
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15512397780424.html">cellnet 网络框架,源码解读</a></h1>
+			<p class="meta"><time datetime="2019-02-27T11:56:18+08:00" 
+			pubdate data-updated="true">2019/2/27</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<pre class="line-numbers"><code class="language-text">├── cellnet
+│   ├── codec               // 编码格式
+│   │   └── json            // json格式编码包
+│   │       └── json.go     // json格式适配器
+│   ├── codec.go            // 编码适配器
+│   ├── internal            // 中文意思,内部,此处是内部用函数包的意思
+│   │   ├── log.go          // 记录日志,初始化
+│   │   └── sesmgr.go       // 会话管理功能的包, 包括增加,移除,获取,遍历,统计等功能
+│   ├── log.go              // 记录日志,初始化
+│   ├── meta.go             // 目标消息体
+│   ├── packet              // 封包解包库
+│   │   ├── log.go          // 记录日志,初始化
+│   │   ├── packet.go       // 核心的封包解包器,2个功能,接收变长包,发送变长包
+│   │   ├── pktreader.go    // Packet,Reader 包数据阅读器
+│   │   ├── pktwriter.go    // Packet,Writer 包数据写入器
+│   │   ├── recv.go         // 接收, length-type-value 封包数据
+│   │   ├── send.go         // 发送, length-type-value 封包数据
+│   │   └── setup.go        // 启动封包器,设定回调进程
+│   ├── peer.go             // 会话管理器
+│   ├── queue.go            // 事件循环队列
+│   ├── socket
+│   │   ├── acceptor.go     // 侦听端口,建立session,管理session,监听端口等
+│   │   ├── connector.go    // 连接器, 开始连接,结束连接,获取session
+│   │   ├── event.go        // 定义了各种事件发生时的结构体
+│   │   ├── log.go          // 记录日志,初始化
+│   │   ├── peer.go         // socket端口,名称,队列,派发事件
+│   │   └── session.go      // 原始连接,同步器,通讯端口,消息队列
+│   └── test
+│       └── test_test.go    // 测试
+└── chat
+    ├── client
+    │   └── main.go         // 客户端
+    ├── proto
+    │   └── chat.go         // 消息通讯格式
+    └── server
+        └── main.go         // 服务器
+
+</code></pre>
+
+<h2 id="toc_0">客户端分析</h2>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15511647865786.html">clickhouse 奇技淫巧</a></h1>
+			<p class="meta"><time datetime="2019-02-26T15:06:26+08:00" 
+			pubdate data-updated="true">2019/2/26</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">函数</h2>
+
+<blockquote>
+<p><code>positionCaseInsensitive</code> 不区分大小写,查找字符串的所在位置, 未找到则为0<br/>
+<code>positionCaseInsensitiveUTF8</code> 同上,不过汉字也算作一个字符<br/>
+<code>cityHash64</code> 快速哈希,规则相同<br/>
+<code>groupArray</code> 根据group 将一个或者多个字段合并成数组<br/>
+<code>intDiv</code> 整除,intDiv(时间戳, 3600)*3600 即可按照每小时分组</p>
+</blockquote>
+
+<h2 id="toc_1">常用</h2>
+
+<blockquote>
+<p><code>optimize table 表名</code> 如果是一个 聚合类型表,那么可以将主动触发一次聚合</p>
+</blockquote>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15510618792149.html">prometheus 安装部署</a></h1>
+			<p class="meta"><time datetime="2019-02-25T10:31:19+08:00" 
+			pubdate data-updated="true">2019/2/25</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">介绍</h2>
+
+<p>Prometheus是一套开源的监控&amp;报警&amp;时间序列数据库的组合,起始是由SoundCloud公司开发的。成立于2012年，之后许多公司和组织接受和采用prometheus,他们便将它独立成开源项目，并且有公司来运作.该项目有非常活跃的社区和开发人员，目前是独立的开源项目，任何公司都可以使用它，2016年，Prometheus加入了云计算基金会，成为kubernetes之后的第二个托管项目.google SRE的书内也曾提到跟他们BorgMon监控系统相似的实现是Prometheus。现在最常见的Kubernetes容器管理系统中，通常会搭配Prometheus进行监控。</p>
+
+<h2 id="toc_1">数据类型</h2>
+
+<h3 id="toc_2">Counter</h3>
+
+<ul>
+<li>用于累计值,请求次数,完成数等</li>
+<li>一直增加,不会减少</li>
+<li>重启后,会被重置</li>
+</ul>
+
+<h3 id="toc_3">Gauge</h3>
+
+<ul>
+<li>Gauge 常规数值, 温度变化,CPU,内存,网络变化</li>
+<li>可变大,可变小</li>
+<li>重启进程后,重置</li>
+</ul>
+
+<h3 id="toc_4">Histogram</h3>
+
+<ul>
+<li>直方图,跟踪时间发生,请求持续时间或响应时间的规模</li>
+<li>可对记录内容分组,提供 count和 sum 全部值的功能</li>
+</ul>
+
+<h3 id="toc_5">Summary</h3>
+
+<p>在prometheus中,任何可被采集的目标都被称为instance,相同类型的instance的集合被称为job</p>
+
+<pre class="line-numbers"><code class="language-text">- job: api-server
+    - instance1: 1.2.3.4:5670
+    - instance2: 1.2.3.4:5671
+    - instance3: 5.6.7.8:5670
+    - instance3: 5.6.7.8:5671
+</code></pre>
+
+<h2 id="toc_6">下载</h2>
+
+<pre class="line-numbers"><code class="language-text">wget https://github.com/prometheus/prometheus/releases/download/v2.7.1/prometheus-2.7.1.linux-amd64.tar.gz
+</code></pre>
+
+<h2 id="toc_7">安装</h2>
+
+<ul>
+<li>解压</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">tar -zxvf prometheus-2.7.1.linux-amd64.tar.gz 
+</code></pre>
+
+<ul>
+<li>创建目录</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">mv ./prometheus-2.7.1.linux-amd64 /usr/local/prometheus
+</code></pre>
+
+<ul>
+<li>创建用户和用户组</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">groupadd prometheus
+useradd -g prometheus -s /sbin/nologin prometheus
+</code></pre>
+
+<h2 id="toc_8">配置开机启动&amp;守护进程</h2>
+
+<ul>
+<li>创建文件</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text"> vim /usr/lib/systemd/system/prometheus.service
+</code></pre>
+
+<ul>
+<li>添加内容</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text"> [Unit]
+Description=Prometheus
+Documentation=https://prometheus.io/
+After=network.target
+
+[Service]
+# Type设置为notify时，服务会不断重启
+Type=simple
+User=prometheus
+# --storage.tsdb.path是可选项，默认数据目录在运行目录的./dada目录中
+ExecStart=/usr/local/prometheus/prometheus --config.file=/usr/local/prometheus/prometheus.yml --storage.tsdb.path=/var/lib/prometheus
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+
+<ul>
+<li>修改权限</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">chown prometheus:prometheus /usr/lib/systemd/system/prometheus.service
+</code></pre>
+
+<ul>
+<li>开启守护进程</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">systemctl enable prometheus
+</code></pre>
+
+<ul>
+<li>启动进程</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">systemctl start prometheus
+</code></pre>
+
+<h2 id="toc_9">使用</h2>
+
+<h3 id="toc_10">编译</h3>
+
+<ul>
+<li>下载</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">go get -u -v github.com/f1yegor/clickhouse_exporter
+</code></pre>
+
+<ul>
+<li>mac 下编译linux 系统软件</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">cd $GOPATH/github.com/f1yegor/clickhouse_exporter
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
+</code></pre>
+
+<h3 id="toc_11">启动</h3>
+
+<ul>
+<li>每台子节点机器都要添加这个任务</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">vim clickhouse_exporter.sh
+</code></pre>
+
+<ul>
+<li>添加内容</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">#!/usr/bin/env bash
+/usr/local/clickhouse_exporter/clickhouse_exporter -log.level=debug -scrape_uri=http://127.0.0.1:8123
+</code></pre>
+
+<ul>
+<li>启动脚本</li>
+</ul>
+
+<pre class="line-numbers"><code class="language-text">chmod +x ./clickhouse_exporter.sh
+nohup clickhouse_exporter.sh &amp;
+</code></pre>
+
+<ul>
+<li>添加定时任务</li>
+</ul>
+
+<blockquote>
+<p>重新打开 prometheus ,修改配置文件<code>prometheus.yml</code>,增加配置<br/>
+此时,数据将会被prometheus所记录</p>
+</blockquote>
+
+<pre class="line-numbers"><code class="language-text">  - job_name: &#39;clickhouse&#39;
+    static_configs:
+    - targets: [&#39;10.0.0.1:9116&#39;]
+      labels:
+        instance: node-01
+    - targets: [&#39;10.0.0.2:9116&#39;]
+      labels:
+        instance: node-02
+    - targets: [&#39;10.0.0.3:9116&#39;]
+      labels:
+        instance: node-03
+</code></pre>
+
+<h2 id="toc_12">优化</h2>
+
+<h2 id="toc_13">总结</h2>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15490763418639.html">下拉框统一查询接口</a></h1>
+			<p class="meta"><time datetime="2019-02-02T10:59:01+08:00" 
+			pubdate data-updated="true">2019/2/2</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">描述</h2>
+
+<blockquote>
+<p>在设计数据查询后台时,经常会遇到一些下拉菜单,需要进行筛选,所以常常需要写一些数据查询接口,这样的接口写多了以后,就需要将其统一抽象起来,方便使用<br/>
+所以编写了这样一套统一api接口</p>
+</blockquote>
+
+<h3 id="toc_1">使用方法</h3>
+
+<h4 id="toc_2">请求地址</h4>
+
+<p><code>/api/fields/any</code></p>
+
+<h4 id="toc_3">请求方式</h4>
+
+<p><strong>GET</strong></p>
+
+<h4 id="toc_4">请求参数</h4>
+
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>类型</th>
+<th>描述</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>table</td>
+<td>string</td>
+<td>指定表名称,可以是抽象表</td>
+</tr>
+<tr>
+<td>field</td>
+<td>string</td>
+<td>指定要取出的字段, 可以是抽象字段</td>
+</tr>
+<tr>
+<td>type</td>
+<td>string</td>
+<td>目前只有 kv, v</td>
+</tr>
+<tr>
+<td>profiex</td>
+<td>string</td>
+<td>字段名添加统一前缀</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="toc_5">配置参数</h2>
+
+<h3 id="toc_6">前置查询</h3>
+
+<h3 id="toc_7">后置查询</h3>
+
+<h3 id="toc_8">虚拟字段</h3>
+
+<h3 id="toc_9">回调函数</h3>
+
+<h3 id="toc_10">返回格式指定</h3>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15488420618155.html">kancloud 文档下载器</a></h1>
+			<p class="meta"><time datetime="2019-01-30T17:54:21+08:00" 
+			pubdate data-updated="true">2019/1/30</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">介绍</h2>
+
+<blockquote>
+<p>最近在 <strong>kancloud(看云)</strong> 上看到一个关于 go语言的文档感觉质量非常不错,但是作者并没有开启下载功能,但我的大部分阅读时间,都是在地铁上,用ipad观看<br/>
+简单看了下看云的api, 决定用 <code>nodejs</code> + <code>gitbook</code> 制作一个 pdf下载器</p>
+</blockquote>
+
+<h2 id="toc_1">安装</h2>
+
+<blockquote>
+</blockquote>
+
+<h2 id="toc_2">使用</h2>
+
+<h2 id="toc_3">功能</h2>
+
+<h2 id="toc_4">利用 gitbook</h2>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
 		  	<h1 class="entry-title"><a href="15488420447689.html"></a></h1>
 			<p class="meta"><time datetime="2019-01-30T17:54:04+08:00" 
 			pubdate data-updated="true">2019/1/30</time></p>
@@ -514,143 +971,9 @@ appendfsync everysec
 		
 
 	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15481372107974.html">redis 集群部署</a></h1>
-			<p class="meta"><time datetime="2019-01-22T14:06:50+08:00" 
-			pubdate data-updated="true">2019/1/22</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<h2 id="toc_0">现有的集群方式</h2>
-
-<ol>
-<li>官方集群 cluster 方式 5.0 自带</li>
-<li>twemproxy 代理方式</li>
-<li>哨兵模式</li>
-<li>codis</li>
-<li>客户端分片模式</li>
-</ol>
-
-<h2 id="toc_1">cluster 集群方式</h2>
-
-<h3 id="toc_2">安装</h3>
-
-<ol>
-<li><p>下载代码</p>
-<pre class="line-numbers"><code class="language-text">mkdir -p /apps/redis-cluster &amp; cd /apps/redis-cluster
-wget http://download.redis.io/releases/redis-5.0.3.tar.gz<br/>
-tar zxvf redis-5.0.3.tar.gz<br/>
-cd redis-5.0.3<br/>
-make<br/>
-cp ./src/redis-server ../<br/>
-cp ./src/redis-cli ../
-</code></pre></li>
-<li><p>创建一组配置文件</p></li>
-</ol>
-
-<pre class="line-numbers"><code class="language-text">mkdir 9001 9002 9003 9004 9005 9006
-</code></pre>
-
-<blockquote>
-<p>每个目录下写入配置</p>
-</blockquote>
-
-<pre class="line-numbers"><code class="language-text"># 设定端口
-port 9001
-# 开启集群
-cluster-enabled yes
-# 保存节点配置文件
-cluster-config-file &quot;nodes.conf&quot;
-# 集群节点的超时时限,默认值为 15000
-cluster-node-timeout 5000
-# 日志文件
-logfile &quot;log.log&quot; 
-# 开启数据持久化 指定是否在每次更新操作后进行日志记录
-appendonly yes
-# 数据文件
-dbfilename &quot;dump.rdb&quot;
-# 守护进程
-daemonize yes
-# 节点间同步密码
-masterauth 123456
-# 设置密码
-requirepass 123456
-</code></pre>
-
-<blockquote>
-<p>每个目录下都执行一遍</p>
-
-<pre class="line-numbers"><code class="language-text">cd ./9001
-../redis-server ./redis.conf
-</code></pre>
-</blockquote>
-
-<h3 id="toc_3">创建集群</h3>
-
-<blockquote>
-<p><code>--replicas 1</code> 表示,每个主节点创建一个从节点<br/>
-下面操作,将会将配置应用到各个节点,并(join)起来,让节点们互相通讯起来</p>
-
-<pre class="line-numbers"><code class="language-text">./redis-cli --cluster create 127.0.0.1:9001 127.0.0.1:9002 127.0.0.1:9003 127.0.0.1:9004 127.0.0.1:9005 127.0.0.1:9006 --cluster-replicas 1
-</code></pre>
-</blockquote>
-
-<h3 id="toc_4">连接方式</h3>
-
-<blockquote>
-<p><code>redis-cli -c -p 9001 -a 123456</code> </p>
-</blockquote>
-
-
-		</div>
-
-		
-
-	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15476981952811.html">goWeb 编程</a></h1>
-			<p class="meta"><time datetime="2019-01-17T12:09:55+08:00" 
-			pubdate data-updated="true">2019/1/17</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<h3 id="toc_0">正文</h3>
-
-<blockquote>
-<p>go 网络服务</p>
-</blockquote>
-
-<pre class="line-numbers"><code class="language-go">package main
-
-import (
-    &quot;net/http&quot;
-    &quot;fmt&quot;
-)
-
-func test(w http.ResponseWrite,r *http.Request) {
-    fmt.Fprintf(w, &quot;hello world %s&quot;, r.URL.Path[1:])
-}
-
-func main() {
-    http.HandleFunc(&quot;/&quot;, test)
-    http.ListenAndServe(&quot;:8080&quot;, nil)
-}
-
-</code></pre>
-
-
-		</div>
-
-		
-
-	</article>
   
 	<div class="pagination">
-	
+	 <a class="prev" href="all_3.html">&larr; Older</a> 
 <a href="archives.html">Blog Archives</a>
 	 <a class="next" href="all_1.html">Newer &rarr;</a>  
 	    
@@ -681,8 +1004,12 @@ func main() {
 	      </li>
 	  
 	      <li class="post">
-	        <a href="%E4%B8%AD%E9%97%B4%E4%BB%B6.html"><strong>中间件&nbsp;(1)</strong></a>
+	        <a href="%E4%B8%AD%E9%97%B4%E4%BB%B6.html"><strong>中间件&nbsp;(6)</strong></a>
 	         <p class="cat-children-p"> 
+	        
+	        	<a href="%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97.html">消息队列&nbsp;(4)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E6%95%B0%E6%8D%AE%E6%B8%85%E6%B4%97.html">数据清洗&nbsp;(1)</a>&nbsp;&nbsp;
 	        
 	        	<a href="%E7%9B%91%E6%8E%A7%E6%8A%A5%E8%AD%A6.html">监控报警&nbsp;(1)</a>&nbsp;&nbsp;
 	        
@@ -690,8 +1017,10 @@ func main() {
 	      </li>
 	  
 	      <li class="post">
-	        <a href="%E8%AF%AD%E8%A8%80.html"><strong>语言&nbsp;(8)</strong></a>
+	        <a href="%E8%AF%AD%E8%A8%80.html"><strong>语言&nbsp;(9)</strong></a>
 	         <p class="cat-children-p"> 
+	        
+	        	<a href="lua.html">lua&nbsp;(1)</a>&nbsp;&nbsp;
 	        
 	        	<a href="php.html">php&nbsp;(4)</a>&nbsp;&nbsp;
 	        
@@ -729,31 +1058,31 @@ func main() {
 	  
 	      
 		      <li class="post">
-		        <a href="15580141033211.html">常见的项目管理工具推荐</a>
+		        <a href="15589244025963.html">大数据架构</a>
 		      </li>
 	     
 	  
 	      
 		      <li class="post">
-		        <a href="15575570747233.html"></a>
+		        <a href="15586915631306.html">对lua携程做超时时间</a>
 		      </li>
 	     
 	  
 	      
 		      <li class="post">
-		        <a href="15572845291359.html">Go mod 使用教程</a>
+		        <a href="15586915348117.html"></a>
 		      </li>
 	     
 	  
 	      
 		      <li class="post">
-		        <a href="15560743380263.html">深度思维笔记</a>
+		        <a href="15586818694083.html">nsq简介</a>
 		      </li>
 	     
 	  
 	      
 		      <li class="post">
-		        <a href="15560194068510.html">resful 最佳实践</a>
+		        <a href="15585794233066.html">mac 安装nsq</a>
 		      </li>
 	     
 	  

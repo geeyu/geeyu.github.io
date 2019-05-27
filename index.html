@@ -82,6 +82,264 @@ $(document).ready(function(event) {
 
 	<article>
 		 <header>
+		  	<h1 class="entry-title"><a href="15589244025963.html">大数据架构</a></h1>
+			<p class="meta"><time datetime="2019-05-27T10:33:22+08:00" 
+			pubdate data-updated="true">2019/5/27</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p><img src="media/15589244025963/15589244211034.jpg" alt="" style="width:917px;"/></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15586915631306.html">对lua携程做超时时间</a></h1>
+			<p class="meta"><time datetime="2019-05-24T17:52:43+08:00" 
+			pubdate data-updated="true">2019/5/24</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<blockquote>
+<p>原理就是设置一个 定时携程,收到任意携程后,关闭整个所有携程,读取任务结果</p>
+</blockquote>
+
+<p><img src="media/15586915631306/15586917264841.jpg" alt="" style="width:701px;"/></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15586915348117.html"></a></h1>
+			<p class="meta"><time datetime="2019-05-24T17:52:14+08:00" 
+			pubdate data-updated="true">2019/5/24</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15586818694083.html">nsq简介</a></h1>
+			<p class="meta"><time datetime="2019-05-24T15:11:09+08:00" 
+			pubdate data-updated="true">2019/5/24</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">基本架构</h2>
+
+<blockquote>
+<p>整体架构图如下<br/>
+<img src="media/15586818694083/15586818876280.jpg" alt="" style="width:642px;"/></p>
+</blockquote>
+
+<h3 id="toc_1">nsqd</h3>
+
+<blockquote>
+<p>负责接收消息,存储队列,将消息发送给客户端<br/>
+这个服务提供了 创建topic功能,并能生成一组 channel交互数据<br/>
+具体过程如下<br/>
+一条消息发送至topic,将会发送到该topic下所有的channel, 发送给某个消费者进行消费</p>
+</blockquote>
+
+<p><img src="media/15586818694083/15586842778254.jpg" alt="" style="width:598px;"/></p>
+
+<h4 id="toc_2">topic</h4>
+
+<blockquote>
+<p>也就是对消息的分区,不同的频道</p>
+</blockquote>
+
+<h4 id="toc_3">channel</h4>
+
+<blockquote>
+<p>消息队列</p>
+</blockquote>
+
+<h3 id="toc_4">nsqlookup</h3>
+
+<blockquote>
+<p>一组类似zookeeper的功能<br/>
+负责服务发现,nsqd当当心跳,状态监测,给客户端,nsqadmin提供nsqd的地址和状态</p>
+</blockquote>
+
+<h3 id="toc_5">nsqadmin</h3>
+
+<blockquote>
+<p>一个webui用于查看nsq消息队列的基本信息</p>
+</blockquote>
+
+<h2 id="toc_6">部署并启动</h2>
+
+<blockquote>
+<p>这里我们使用docker-compose 部署一个nsq集群, 架构如下</p>
+</blockquote>
+
+<p>单个 nsqd 可以有多个 Topic，每个 Topic 又可以有多个 Channel。Channel 能够接收 Topic 所有消息的副本，从而实现了消息多播分发；而 Channel 上的每个消息被分发给它的订阅者，从而实现负载均衡，所有这些就组成了一个可以表示各种简单和复杂拓扑结构的强大框架。</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15585794233066.html">mac 安装nsq</a></h1>
+			<p class="meta"><time datetime="2019-05-23T10:43:43+08:00" 
+			pubdate data-updated="true">2019/5/23</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">使用docker-compose</h2>
+
+<blockquote>
+<p>创建docker-compose.yml文件,并写入以下内容</p>
+</blockquote>
+
+<pre class="line-numbers"><code class="language-yml">version: &#39;3&#39;
+
+services:
+  nsqlookupd:
+    image: nsqio/nsq
+    networks:
+      - nsq-network
+    hostname: nsqlookupd
+    ports:
+      - &quot;4161:4161&quot;
+      - &quot;4160:4160&quot;
+    command: /nsqlookupd
+  nsqd:
+    image: nsqio/nsq
+    depends_on:
+      - nsqlookupd
+    hostname: nsqd
+    volumes:
+      - ./data:/data
+    networks:
+      - nsq-network
+    ports:
+      - &quot;4151:4151&quot;
+      - &quot;4150:4150&quot;
+    command: /nsqd --broadcast-address=nsqd --lookupd-tcp-address=nsqlookupd:4160 --data-path=/data
+  nsqadmin:
+    image: nsqio/nsq
+    depends_on:
+      - nsqlookupd
+    hostname: nsqadmin
+    ports:
+      - &quot;4171:4171&quot;
+    networks:
+      - nsq-network
+    command: /nsqadmin --lookupd-http-address=nsqlookupd:4161
+
+networks:
+  nsq-network:
+    driver: bridge
+</code></pre>
+
+<h2 id="toc_1">下载php-nsq扩展并编译安装</h2>
+
+<pre class="line-numbers"><code class="language-text">git clone https://github.com/yunnian/php-nsq.git
+cd ./php-nsq
+sudo phpize
+./configure
+ make &amp;&amp; make install
+ make test
+ cd /usr/local/etc/php/.../
+ // 在php.ini 中添加 extension=&quot;nsq.so&quot;
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15585180475485.html">mac上kafak的安装</a></h1>
+			<p class="meta"><time datetime="2019-05-22T17:40:47+08:00" 
+			pubdate data-updated="true">2019/5/22</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h2 id="toc_0">使用docker-compose快速启用kafka</h2>
+
+<blockquote>
+<p>创建 <code>docker-compose.yml</code>文件并写入以下内容</p>
+</blockquote>
+
+<pre class="line-numbers"><code class="language-text">version: &#39;3&#39;
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - &quot;2181:2181&quot;
+  kafka:
+    image: wurstmeister/kafka
+    depends_on: [ zookeeper ]
+    ports:
+      - &quot;9092:9092&quot;
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: 192.168.1.40
+      KAFKA_CREATE_TOPICS: &quot;test:1:1&quot;
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    volumes:
+      - ./docker.sock:/var/run/docker.sock
+</code></pre>
+
+<h2 id="toc_1">安装php-rdkafka扩展</h2>
+
+<pre class="line-numbers"><code class="language-shell">brew install librdkafka
+sudo pecl install rdkafka
+
+php -m | grep kafka // 如果有内容,说明安装成功
+</code></pre>
+
+<h2 id="toc_2">快速使用小demo</h2>
+
+<blockquote>
+<p>生产者</p>
+</blockquote>
+
+<pre class="line-numbers"><code class="language-php">
+</code></pre>
+
+<blockquote>
+<p>消费者</p>
+</blockquote>
+
+<pre class="line-numbers"><code class="language-php">
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
 		  	<h1 class="entry-title"><a href="15580141033211.html">常见的项目管理工具推荐</a></h1>
 			<p class="meta"><time datetime="2019-05-16T21:41:43+08:00" 
 			pubdate data-updated="true">2019/5/16</time></p>
@@ -400,485 +658,6 @@ $(document).ready(function(event) {
 		
 
 	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15560194068510.html">resful 最佳实践</a></h1>
-			<p class="meta"><time datetime="2019-04-23T19:36:46+08:00" 
-			pubdate data-updated="true">2019/4/23</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<h2 id="toc_0">url设计</h2>
-
-<ol>
-<li>推荐使用复数名词 <code>/employees/21</code></li>
-<li>在资源集合URL 上使用GET方法,更加直观 <code>GET  /employees?state=external</code></li>
-<li>对特定资源进行过滤, 将搜索字符串附加到查询参数中即可 <code>GET /employees?state=internal</code></li>
-</ol>
-
-<h2 id="toc_1">使用http方法操作资源(CURD)</h2>
-
-<blockquote>
-<p>这种方式可以用简洁的方式获取7种操作资源的方式<br/>
-如果一个请求是 indempotent(即发送两个一样的请求,后一个会覆盖前一个),此时使用PUT方法,否则使用POST方法</p>
-</blockquote>
-
-<table>
-<thead>
-<tr>
-<th></th>
-<th>Post(创建)</th>
-<th>GET(读取)</th>
-<th>PUT(更新)</th>
-<th>DELETE(删除)</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td>/employees</td>
-<td>创建</td>
-<td>列出</td>
-<td>批量更新</td>
-<td>删除所有</td>
-</tr>
-<tr>
-<td>/employees/56</td>
-<td>X</td>
-<td>获取56号员工的信息</td>
-<td>更新56号员工的信息</td>
-<td>删除56号员工的信息</td>
-</tr>
-</tbody>
-</table>
-
-<h2 id="toc_2">非资源请求用动词</h2>
-
-<blockquote>
-<p>使用动词来区分资源和非资源,url中使用动词而非名词 <code>GET /translate?from=de_DE&amp;to=en_US&amp;text=Hallo</code><br/>
-增加资源动作控制参数 <code>PUT /articles/id?published=true</code><br/>
-把动作转换为一个可以操作的资源 例如github,&quot;喜欢&quot;一个gist,转换为增加一个<code>/gists/id/star</code>子资源,对其操作 <code>PUT /gists/id/star</code>,<code>DELETE /gists/:id/star</code></p>
-</blockquote>
-
-<h2 id="toc_3">使用标准 http 响应码</h2>
-
-<h3 id="toc_4">请求成功:</h3>
-
-<ul>
-<li>200 OK: 请求已成功,Body有返回内容, 用于 GET Method 的API 返回码</li>
-<li>201 Created: 请求已经被实现,资源被创建. 用于 POST Method的同步类型API返回码</li>
-<li>202 Accepted: 服务器已经接受请求,但尚未处理. 用于 POST Method的异步类型API返回码</li>
-<li>204 No Content: 服务器成功处理了请求,但没有返回任何内容, 用于 DELETE/PUT Method 的API的返回码</li>
-</ul>
-
-<h3 id="toc_5">因为客户端原因导致请求失败:</h3>
-
-<ul>
-<li>400 Bad Request: 如参数错误,格式错误</li>
-<li>401 Unauthorized: 用户未被认证, 如果密码错误,证书错误</li>
-<li>403 Forbidden: 用户权限不够</li>
-<li>404 Not Found: 服务器无此资源, 通常为URL不存在,或者某个Method不存在</li>
-<li>409 Conflict: 请求存在冲突,无法处理该请求 (比如某个资源禁止被再次修改,但请求想修改该资源,就要返回409)</li>
-</ul>
-
-<h3 id="toc_6">因服务端原因导致请求失败:</h3>
-
-<ul>
-<li>500 Internal Server Error: 服务端错误消息,服务器遇到一个未曾预料的状况</li>
-<li>501 Not Implemented: 服务器不支持当前请求所需要的某个功能</li>
-<li>503 Service Unavailable: 如服务器维护中或者过载等</li>
-</ul>
-
-<h2 id="toc_7">返回有用的提示信息</h2>
-
-<h3 id="toc_8">除了合适的状态码之外,还应当在正文中提供有用的错误提示和详细的描述</h3>
-
-<pre class="line-numbers"><code class="language-javascript">   // 400 Bad Request
-   {
-    &quot;message&quot;: &quot;You submitted an invalid state. Valid state values are &#39;internal&#39; or &#39;external&#39;&quot;,
-    &quot;errorCode&quot;: 352,
-    &quot;additionalInformation&quot; :&quot;http://www.domain.com/rest/errorcode/352&quot;
-   }
-</code></pre>
-
-<h3 id="toc_9">响应中提供浏览其他API的链接</h3>
-
-<blockquote>
-<p>如,在响应参数中添加一个 links 字段，让客户端可以自动变更,也可以自我描述,需要提供的文档更少</p>
-</blockquote>
-
-<pre class="line-numbers"><code class="language-javascript">{
-  &quot;id&quot;:1,
-  &quot;name&quot;:&quot;Paul&quot;,
-  &quot;links&quot;: [
-     {
-        &quot;rel&quot;: &quot;salary&quot;,
-        &quot;href&quot;: &quot;/employees/1/salaryStatements&quot;
-     }
-  ]
-}
-</code></pre>
-
-<h3 id="toc_10">提供分页信息</h3>
-
-<blockquote>
-<p>资源较多时,可以用 <code>page</code>,<code>page_size</code> 来提供分页 <code>/employees?page=30&amp;page_size=15 #返回 30 到 45 的员工</code><br/>
-还可以添加上一页和下一页的链接示例</p>
-</blockquote>
-
-<pre class="line-numbers"><code class="language-text">   GET /employees?offset=20&amp;limit=10
-   {
-   &quot;offset&quot;: 20,
-   &quot;limit&quot;: 10,
-   &quot;total&quot;: 3465,
-   &quot;employees&quot;: [
-    //...
-   ],
-   &quot;links&quot;: [
-     {
-        &quot;rel&quot;: &quot;nextPage&quot;,
-        &quot;href&quot;: &quot;/employees?offset=30&amp;limit=10&quot;
-     },
-     {
-        &quot;rel&quot;: &quot;previousPage&quot;,
-        &quot;href&quot;: &quot;/employees?offset=10&amp;limit=10&quot;
-     }
-   ]
-   }
-</code></pre>
-
-<h2 id="toc_11">使用https</h2>
-
-<blockquote>
-<p>禁止非ssl的url重定向到ssl的url</p>
-</blockquote>
-
-<h2 id="toc_12">授权</h2>
-
-<ul>
-<li>验证(Authentication) 为了确定用户申明的身份</li>
-<li>授权(Authorization) 为用户增加某个资源的操作权限</li>
-</ul>
-
-<h2 id="toc_13">Location</h2>
-
-<p>在响应的header中使用,一般为客户端感兴趣的资源url,如果成功创建一个资源后,把新资源url放在Location中<br/>
-异步创建请求,也可以在响应 202的同时,添加一个可以异步状态查询的地址</p>
-
-<h2 id="toc_14">API地址</h2>
-
-<p>在url中指定API的版本号 <code>https://api.github.com/v3</code><br/>
-如果api变化很大,可以把api设计为子域名 <code>https://v3.api.demo.com</code><br/>
-不需要次级版本,只有当接口不兼容,才应该变更版本号</p>
-
-<h3 id="toc_15">两种实现方式</h3>
-
-<ul>
-<li> url中 如<code>https://example.com/api/v1</code>, 
-<ul>
-<li>版本明确,方便调试</li>
-<li>不同版本协议解析可以放在不同的服务器上</li>
-<li>不用考虑协议兼容性,开发简便,升级不受影响</li>
-</ul></li>
-<li>HTTP Header 中
-<ul>
-<li>url简洁干净,符合RESTful惯例</li>
-</ul></li>
-</ul>
-
-<h2 id="toc_16">连字符</h2>
-
-<p>url 中应该尽量使用 &quot;-&quot; 来代替下划线&quot;_&quot;的使用,如<br/>
-<code>http://api.example.restapi.org/blogs/mark-masse/entries/this-is-my-first-post</code></p>
-
-<h2 id="toc_17">大小写</h2>
-
-<p>根据 RFC3986 定义，URI 是对大小写敏感的，所以为了避免歧义，我们尽量用小写字符</p>
-
-
-		</div>
-
-		
-
-	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15554074466566.html">git 一些常用的命令</a></h1>
-			<p class="meta"><time datetime="2019-04-16T17:37:26+08:00" 
-			pubdate data-updated="true">2019/4/16</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<h2 id="toc_0">删除错误的提交</h2>
-
-<pre class="line-numbers"><code class="language-text">// 重置改动到 某次提交
-git reset commit_id
-// 强制push, 远程的commit_id 之后的push将会被删掉
-git push --force
-</code></pre>
-
-
-		</div>
-
-		
-
-	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15553150635573.html">给clickhouse 物化视图增加字段</a></h1>
-			<p class="meta"><time datetime="2019-04-15T15:57:43+08:00" 
-			pubdate data-updated="true">2019/4/15</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<pre class="line-numbers"><code class="language-sql">-- 先查找一下sql路径
-SELECT metadata_path FROM system.tables WHERE name = &#39;demo&#39;;
-
--- 摘除掉视图
-DETACH table mid.play_block_status
-
--- 为 .inner.demo 表增加字段
-alter table mid.`.inner.demo` add column ip String;
-alter table mid.`.inner.demo` add column operator String;
-
--- 为 物化视图增加字段
-根据第一步 查到的 metadata_path 路径, 为视图修改表结构
-
--- 重新加载视图
-ATTACH table mid.play_block_status
-</code></pre>
-
-
-		</div>
-
-		
-
-	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15548815336055.html">php相关函数</a></h1>
-			<p class="meta"><time datetime="2019-04-10T15:32:13+08:00" 
-			pubdate data-updated="true">2019/4/10</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<h3 id="toc_0">umask() 函数,改变umask值,使进程权限保持一致</h3>
-
-<pre class="line-numbers"><code class="language-text">编写linux守护进程的时候,需要设置umask 这个值,用户权限屏蔽位, 
-当用户创建目录或者文件的时候,会有一个预设的权限 r=4,w=2,x=1
-目录的预设权限是：0777 drwxrwxrwx
-文件的预设权限为: 0666 -rw-rw-rw-
-
-用这个权限减去 umask的权限,就是新建的目录或者文件的实际权限了
-umask 默认值为  0022
-新建文件夹权限为  0777 - 0022 = 0755
-新建文件权限为   0666 - 0022 = 0644
-</code></pre>
-
-<h3 id="toc_1">pcntl_fork() 函数,在进程的当前位置产生分支(子进程)</h3>
-
-<p>在当前进程的当前位置 产生分支(子进程), 都从fork位置继续执行, <br/>
-成功时<br/>
-    父进程执行过程中得到的fork返回值为子进程号,子进程得到的是0<br/>
-失败时<br/>
-    父进程将会返回 -1,不会创建子进程,并引发一个php错误</p>
-
-<h3 id="toc_2">posix_setsid() 新建一个session终端,脱离原有终端的控制</h3>
-
-<p>成功时<br/>
-    返回 session_id<br/>
-失败时<br/>
-    返回 -1</p>
-
-<h3 id="toc_3">php_sapi_name() 判断运行时环境</h3>
-
-<h3 id="toc_4">extension_loaded() 检查一个扩展是否已经加载</h3>
-
-<h3 id="toc_5">cli_set_process_title()</h3>
-
-<p>为进程设定title <br/>
-成功时<br/>
-    返回 true<br/>
-失败时<br/>
-    返回 false</p>
-
-
-		</div>
-
-		
-
-	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15543440484929.html">查看表占用磁盘空间大小</a></h1>
-			<p class="meta"><time datetime="2019-04-04T10:14:08+08:00" 
-			pubdate data-updated="true">2019/4/4</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<pre class="line-numbers"><code class="language-sql">SELECT table, formatReadableSize(size) as size, rows, days, formatReadableSize(avgDaySize) as avgDaySize FROM (
-    SELECT
-        table,
-        sum(bytes) AS size,
-        sum(rows) AS rows,
-        min(min_date) AS min_date,
-        max(max_date) AS max_date,
-        (max_date - min_date) AS days,
-        size / (max_date - min_date) AS avgDaySize
-    FROM system.parts
-    WHERE active
-    GROUP BY table
-    ORDER BY rows DESC
-)
-</code></pre>
-
-
-		</div>
-
-		
-
-	</article>
- 
-	<article>
-		 <header>
-		  	<h1 class="entry-title"><a href="15540894210258.html">php 生成uuid的统一类</a></h1>
-			<p class="meta"><time datetime="2019-04-01T11:30:21+08:00" 
-			pubdate data-updated="true">2019/4/1</time></p>
-		 </header>
-	  	<div class="entry-content">
-		  	
-		  	<pre class="line-numbers"><code class="language-php">&lt;?php
-class UUID {
-  public static function v3($namespace, $name) {
-    if(!self::is_valid($namespace)) return false;
-
-    // Get hexadecimal components of namespace
-    $nhex = str_replace(array(&#39;-&#39;,&#39;{&#39;,&#39;}&#39;), &#39;&#39;, $namespace);
-
-    // Binary Value
-    $nstr = &#39;&#39;;
-
-    // Convert Namespace UUID to bits
-    for($i = 0; $i &lt; strlen($nhex); $i+=2) {
-      $nstr .= chr(hexdec($nhex[$i].$nhex[$i+1]));
-    }
-
-    // Calculate hash value
-    $hash = md5($nstr . $name);
-
-    return sprintf(&#39;%08s-%04s-%04x-%04x-%12s&#39;,
-
-      // 32 bits for &quot;time_low&quot;
-      substr($hash, 0, 8),
-
-      // 16 bits for &quot;time_mid&quot;
-      substr($hash, 8, 4),
-
-      // 16 bits for &quot;time_hi_and_version&quot;,
-      // four most significant bits holds version number 3
-      (hexdec(substr($hash, 12, 4)) &amp; 0x0fff) | 0x3000,
-
-      // 16 bits, 8 bits for &quot;clk_seq_hi_res&quot;,
-      // 8 bits for &quot;clk_seq_low&quot;,
-      // two most significant bits holds zero and one for variant DCE1.1
-      (hexdec(substr($hash, 16, 4)) &amp; 0x3fff) | 0x8000,
-
-      // 48 bits for &quot;node&quot;
-      substr($hash, 20, 12)
-    );
-  }
-
-  public static function v4() {
-    return sprintf(&#39;%04x%04x-%04x-%04x-%04x-%04x%04x%04x&#39;,
-
-      // 32 bits for &quot;time_low&quot;
-      mt_rand(0, 0xffff), mt_rand(0, 0xffff),
-
-      // 16 bits for &quot;time_mid&quot;
-      mt_rand(0, 0xffff),
-
-      // 16 bits for &quot;time_hi_and_version&quot;,
-      // four most significant bits holds version number 4
-      mt_rand(0, 0x0fff) | 0x4000,
-
-      // 16 bits, 8 bits for &quot;clk_seq_hi_res&quot;,
-      // 8 bits for &quot;clk_seq_low&quot;,
-      // two most significant bits holds zero and one for variant DCE1.1
-      mt_rand(0, 0x3fff) | 0x8000,
-
-      // 48 bits for &quot;node&quot;
-      mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
-    );
-  }
-
-  public static function v5($namespace, $name) {
-    if(!self::is_valid($namespace)) return false;
-
-    // Get hexadecimal components of namespace
-    $nhex = str_replace(array(&#39;-&#39;,&#39;{&#39;,&#39;}&#39;), &#39;&#39;, $namespace);
-
-    // Binary Value
-    $nstr = &#39;&#39;;
-
-    // Convert Namespace UUID to bits
-    for($i = 0; $i &lt; strlen($nhex); $i+=2) {
-      $nstr .= chr(hexdec($nhex[$i].$nhex[$i+1]));
-    }
-
-    // Calculate hash value
-    $hash = sha1($nstr . $name);
-
-    return sprintf(&#39;%08s-%04s-%04x-%04x-%12s&#39;,
-
-      // 32 bits for &quot;time_low&quot;
-      substr($hash, 0, 8),
-
-      // 16 bits for &quot;time_mid&quot;
-      substr($hash, 8, 4),
-
-      // 16 bits for &quot;time_hi_and_version&quot;,
-      // four most significant bits holds version number 5
-      (hexdec(substr($hash, 12, 4)) &amp; 0x0fff) | 0x5000,
-
-      // 16 bits, 8 bits for &quot;clk_seq_hi_res&quot;,
-      // 8 bits for &quot;clk_seq_low&quot;,
-      // two most significant bits holds zero and one for variant DCE1.1
-      (hexdec(substr($hash, 16, 4)) &amp; 0x3fff) | 0x8000,
-
-      // 48 bits for &quot;node&quot;
-      substr($hash, 20, 12)
-    );
-  }
-
-  public static function is_valid($uuid) {
-    return preg_match(&#39;/^\{?[0-9a-f]{8}\-?[0-9a-f]{4}\-?[0-9a-f]{4}\-?&#39;.
-                      &#39;[0-9a-f]{4}\-?[0-9a-f]{12}\}?$/i&#39;, $uuid) === 1;
-  }
-}
-
-// Usage
-// Named-based UUID.
-
-$v3uuid = UUID::v3(&#39;1546058f-5a25-4334-85ae-e68f2a44bbaf&#39;, &#39;SomeRandomString&#39;);
-$v5uuid = UUID::v5(&#39;1546058f-5a25-4334-85ae-e68f2a44bbaf&#39;, &#39;SomeRandomString&#39;);
-
-// Pseudo-random UUID
-
-$v4uuid = UUID::v4();
-?&gt;
-</code></pre>
-
-
-		</div>
-
-		
-
-	</article>
   
 	<div class="pagination">
 	 <a class="prev" href="all_1.html">&larr; Older</a> 
@@ -912,8 +691,12 @@ $v4uuid = UUID::v4();
 	      </li>
 	  
 	      <li class="post">
-	        <a href="%E4%B8%AD%E9%97%B4%E4%BB%B6.html"><strong>中间件&nbsp;(1)</strong></a>
+	        <a href="%E4%B8%AD%E9%97%B4%E4%BB%B6.html"><strong>中间件&nbsp;(6)</strong></a>
 	         <p class="cat-children-p"> 
+	        
+	        	<a href="%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97.html">消息队列&nbsp;(4)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E6%95%B0%E6%8D%AE%E6%B8%85%E6%B4%97.html">数据清洗&nbsp;(1)</a>&nbsp;&nbsp;
 	        
 	        	<a href="%E7%9B%91%E6%8E%A7%E6%8A%A5%E8%AD%A6.html">监控报警&nbsp;(1)</a>&nbsp;&nbsp;
 	        
@@ -921,8 +704,10 @@ $v4uuid = UUID::v4();
 	      </li>
 	  
 	      <li class="post">
-	        <a href="%E8%AF%AD%E8%A8%80.html"><strong>语言&nbsp;(8)</strong></a>
+	        <a href="%E8%AF%AD%E8%A8%80.html"><strong>语言&nbsp;(9)</strong></a>
 	         <p class="cat-children-p"> 
+	        
+	        	<a href="lua.html">lua&nbsp;(1)</a>&nbsp;&nbsp;
 	        
 	        	<a href="php.html">php&nbsp;(4)</a>&nbsp;&nbsp;
 	        
@@ -960,31 +745,31 @@ $v4uuid = UUID::v4();
 	  
 	      
 		      <li class="post">
-		        <a href="15580141033211.html">常见的项目管理工具推荐</a>
+		        <a href="15589244025963.html">大数据架构</a>
 		      </li>
 	     
 	  
 	      
 		      <li class="post">
-		        <a href="15575570747233.html"></a>
+		        <a href="15586915631306.html">对lua携程做超时时间</a>
 		      </li>
 	     
 	  
 	      
 		      <li class="post">
-		        <a href="15572845291359.html">Go mod 使用教程</a>
+		        <a href="15586915348117.html"></a>
 		      </li>
 	     
 	  
 	      
 		      <li class="post">
-		        <a href="15560743380263.html">深度思维笔记</a>
+		        <a href="15586818694083.html">nsq简介</a>
 		      </li>
 	     
 	  
 	      
 		      <li class="post">
-		        <a href="15560194068510.html">resful 最佳实践</a>
+		        <a href="15585794233066.html">mac 安装nsq</a>
 		      </li>
 	     
 	  
